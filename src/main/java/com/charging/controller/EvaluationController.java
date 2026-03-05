@@ -1,0 +1,48 @@
+package com.charging.controller;
+
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.charging.common.result.Result;
+import com.charging.dto.EvaluationCreateRequest;
+import com.charging.dto.EvaluationReplyRequest;
+import com.charging.security.util.SecurityUtils;
+import com.charging.service.EvaluationService;
+import com.charging.vo.EvaluationVO;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+public class EvaluationController {
+
+    private final EvaluationService evaluationService;
+
+    @PostMapping("/api/evaluation")
+    public Result<Void> create(@Valid @RequestBody EvaluationCreateRequest request) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        evaluationService.create(userId, request);
+        return Result.success("评价发表成功", null);
+    }
+
+    @GetMapping("/api/evaluation/station/{stationId}")
+    public Result<Page<EvaluationVO>> listByStation(
+            @PathVariable Long stationId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Result.success(evaluationService.listByStation(stationId, page, size));
+    }
+
+    @PutMapping("/api/operator/evaluation/{id}/reply")
+    public Result<Void> reply(@PathVariable Long id,
+                              @Valid @RequestBody EvaluationReplyRequest request) {
+        Long operatorId = SecurityUtils.getCurrentUserId();
+        evaluationService.reply(operatorId, id, request);
+        return Result.success("回复成功", null);
+    }
+
+    @PutMapping("/api/admin/evaluation/{id}/hide")
+    public Result<Void> hide(@PathVariable Long id) {
+        evaluationService.hide(id);
+        return Result.success("评价已屏蔽", null);
+    }
+}
