@@ -13,6 +13,10 @@ public interface UserService {
 
     LoginVO login(LoginRequest request);
 
+    void forgotPassword(ForgotPasswordRequest request);
+
+    void resetPassword(ResetPasswordRequest request);
+
     UserInfoVO getUserInfo(Long userId);
 
     void updateProfile(Long userId, UpdateProfileRequest request);

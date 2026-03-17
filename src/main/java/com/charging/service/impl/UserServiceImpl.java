@@ -10,18 +10,22 @@ import com.charging.mapper.UserMapper;
 import com.charging.mapper.VehicleMapper;
 import com.charging.mapper.WalletMapper;
 import com.charging.security.util.JwtUtils;
+import com.charging.service.EmailService;
 import com.charging.service.UserService;
 import com.charging.vo.LoginVO;
 import com.charging.vo.UserInfoVO;
 import com.charging.vo.VehicleVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +37,11 @@ public class UserServiceImpl implements UserService {
     private final WalletMapper walletMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
+    private final StringRedisTemplate redisTemplate;
+    private final EmailService emailService;
+
+    private static final String RESET_CODE_PREFIX = "reset:code:";
+    private static final long RESET_CODE_EXPIRE_MINUTES = 5;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -163,5 +172,37 @@ public class UserServiceImpl implements UserService {
             BeanUtils.copyProperties(v, vo);
             return vo;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void forgotPassword(ForgotPasswordRequest request) {
+        User user = userMapper.selectByEmail(request.getEmail());
+        if (user == null) {
+            throw new BusinessException(404, "该邮箱未注册");
+        }
+        String code = String.format("%06d", new Random().nextInt(1000000));
+        redisTemplate.opsForValue().set(RESET_CODE_PREFIX + request.getEmail(), code,
+                RESET_CODE_EXPIRE_MINUTES, TimeUnit.MINUTES);
+        emailService.sendResetCode(request.getEmail(), code);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void resetPassword(ResetPasswordRequest request) {
+        String key = RESET_CODE_PREFIX + request.getEmail();
+        String savedCode = redisTemplate.opsForValue().get(key);
+        if (savedCode == null) {
+            throw new BusinessException(400, "验证码已过期，请重新发送");
+        }
+        if (!savedCode.equals(request.getCode())) {
+            throw new BusinessException(400, "验证码错误");
+        }
+        User user = userMapper.selectByEmail(request.getEmail());
+        if (user == null) {
+            throw new BusinessException(404, "用户不存在");
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userMapper.updateById(user);
+        redisTemplate.delete(key);
     }
 }
