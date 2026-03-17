@@ -19,6 +19,9 @@ public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM `user` WHERE phone = #{phone} AND deleted = 0 LIMIT 1")
     User selectByPhone(String phone);
 
+    @Select("SELECT * FROM `user` WHERE email = #{email} AND deleted = 0 LIMIT 1")
+    User selectByEmail(String email);
+
     @Select("SELECT DATE_FORMAT(create_time,'%Y-%m') AS month, COUNT(*) AS newUsers " +
             "FROM `user` WHERE deleted = 0 AND create_time >= #{startDate} AND create_time < #{endDate} " +
             "GROUP BY DATE_FORMAT(create_time,'%Y-%m') ORDER BY month")

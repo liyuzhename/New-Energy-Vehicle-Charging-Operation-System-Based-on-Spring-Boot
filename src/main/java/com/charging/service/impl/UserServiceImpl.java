@@ -43,10 +43,14 @@ public class UserServiceImpl implements UserService {
         if (userMapper.selectByPhone(request.getPhone()) != null) {
             throw new BusinessException(400, "手机号已被注册");
         }
+        if (userMapper.selectByEmail(request.getEmail()) != null) {
+            throw new BusinessException(400, "邮箱已被注册");
+        }
 
         User user = new User();
         user.setUsername(request.getUsername());
         user.setPhone(request.getPhone());
+        user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRole("USER");
         user.setStatus(1);
