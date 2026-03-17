@@ -21,16 +21,16 @@ public class OperatorOrderController {
 
     @GetMapping("/order/list")
     public Result<Page<OrderVO>> list(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         return Result.success(orderService.listForOperator(operatorId, page, size));
     }
 
     @GetMapping("/income")
     public Result<IncomeVO> income(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(value = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         return Result.success(orderService.getIncome(operatorId, startDate, endDate));
     }

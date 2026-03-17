@@ -23,31 +23,43 @@ public class AdminController {
 
     @GetMapping("/user/list")
     public Result<Page<UserManageVO>> listUsers(
-            @RequestParam(required = false) String role,
-            @RequestParam(required = false) Integer status,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return Result.success(adminService.listUsers(role, status, keyword, page, size));
+            @RequestParam(value = "role", required = false) String role,
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        Integer statusInt = parseStatus(status);
+        return Result.success(adminService.listUsers(role, statusInt, keyword, page, size));
     }
 
     @PutMapping("/user/{id}/status")
-    public Result<Void> updateUserStatus(@PathVariable Long id, @RequestParam Integer status) {
-        adminService.updateUserStatus(id, status);
+    public Result<Void> updateUserStatus(@PathVariable("id") Long id,
+                                         @RequestParam(value = "status") String status) {
+        Integer statusInt = parseStatus(status);
+        if (statusInt == null) return Result.error(400, "状态值不合法，请传 0（禁用）或 1（启用）");
+        adminService.updateUserStatus(id, statusInt);
         return Result.success("用户状态已更新", null);
     }
 
     @GetMapping("/operator/list")
     public Result<Page<UserManageVO>> listOperators(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return Result.success(adminService.listOperators(page, size));
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return Result.success(adminService.listOperators(keyword, page, size));
+    }
+
+    private Integer parseStatus(String status) {
+        if (status == null || status.isBlank()) return null;
+        if ("0".equals(status) || "disabled".equalsIgnoreCase(status) || "禁用".equals(status)) return 0;
+        if ("1".equals(status) || "enabled".equalsIgnoreCase(status) || "启用".equals(status)) return 1;
+        try { return Integer.parseInt(status); } catch (NumberFormatException e) { return null; }
     }
 
     @GetMapping("/announcement/list")
     public Result<Page<AnnouncementVO>> listAnnouncements(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         return Result.success(adminService.listAnnouncements(page, size));
     }
 
@@ -59,23 +71,23 @@ public class AdminController {
     }
 
     @PutMapping("/announcement/{id}")
-    public Result<Void> updateAnnouncement(@PathVariable Long id,
+    public Result<Void> updateAnnouncement(@PathVariable("id") Long id,
                                            @RequestBody AnnouncementRequest request) {
         adminService.updateAnnouncement(id, request);
         return Result.success("公告更新成功", null);
     }
 
     @PutMapping("/announcement/{id}/offline")
-    public Result<Void> offlineAnnouncement(@PathVariable Long id) {
+    public Result<Void> offlineAnnouncement(@PathVariable("id") Long id) {
         adminService.offlineAnnouncement(id);
         return Result.success("公告已下线", null);
     }
 
     @GetMapping("/log/list")
     public Result<Page<OperationLogVO>> listLogs(
-            @RequestParam(required = false) String operatorName,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "operatorName", required = false) String operatorName,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         return Result.success(operationLogService.list(operatorName, page, size));
     }
 }

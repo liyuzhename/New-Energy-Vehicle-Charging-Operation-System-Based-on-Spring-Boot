@@ -43,9 +43,9 @@ public class OrderController {
 
     @GetMapping("/my")
     public Result<Page<OrderVO>> listMy(
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Long userId = SecurityUtils.getCurrentUserId();
         return Result.success(orderService.listMy(userId, status, page, size));
     }

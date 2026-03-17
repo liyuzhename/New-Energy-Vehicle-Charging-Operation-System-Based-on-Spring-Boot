@@ -33,8 +33,8 @@ public class WalletController {
 
     @GetMapping("/records")
     public Result<Page<PaymentRecordVO>> getRecords(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Long userId = SecurityUtils.getCurrentUserId();
         return Result.success(walletService.getRecords(userId, page, size));
     }

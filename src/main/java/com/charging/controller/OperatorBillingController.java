@@ -24,7 +24,7 @@ public class OperatorBillingController {
     }
 
     @PutMapping("/{id}")
-    public Result<Void> update(@PathVariable Long id,
+    public Result<Void> update(@PathVariable("id") Long id,
                                @RequestBody BillingRuleUpdateRequest request) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         billingRuleService.update(operatorId, id, request);
@@ -32,7 +32,7 @@ public class OperatorBillingController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
+    public Result<Void> delete(@PathVariable("id") Long id) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         billingRuleService.delete(operatorId, id);
         return Result.success("计费规则删除成功", null);

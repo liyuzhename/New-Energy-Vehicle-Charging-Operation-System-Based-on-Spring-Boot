@@ -34,15 +34,15 @@ public class FaultController {
 
     @GetMapping("/api/operator/fault/list")
     public Result<Page<FaultRecordVO>> listForOperator(
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         return Result.success(faultRecordService.listForOperator(operatorId, status, page, size));
     }
 
     @PutMapping("/api/operator/fault/{id}/handle")
-    public Result<Void> handle(@PathVariable Long id,
+    public Result<Void> handle(@PathVariable("id") Long id,
                                @Valid @RequestBody FaultHandleRequest request) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         faultRecordService.handle(operatorId, id, request);
@@ -51,9 +51,9 @@ public class FaultController {
 
     @GetMapping("/api/admin/fault/list")
     public Result<Page<FaultRecordVO>> listForAdmin(
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         return Result.success(faultRecordService.listForAdmin(status, page, size));
     }
 }

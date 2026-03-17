@@ -21,10 +21,10 @@ public class StationController {
 
     @GetMapping("/api/station/list")
     public Result<Page<StationVO>> list(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String city,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "city", required = false) String city,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         return Result.success(chargingStationService.listForUser(keyword, city, page, size));
     }
 

@@ -22,7 +22,7 @@ public interface ChargingOrderService {
 
     Page<OrderVO> listForOperator(Long operatorId, int page, int size);
 
-    Page<OrderVO> listForAdmin(String status, int page, int size);
+    Page<OrderVO> listForAdmin(String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
 
     void applyRefund(Long userId, Long orderId);
 

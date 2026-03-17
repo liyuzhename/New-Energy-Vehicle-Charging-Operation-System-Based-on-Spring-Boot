@@ -24,9 +24,9 @@ public class OperatorPileController {
 
     @GetMapping("/api/operator/pile/list")
     public Result<Page<PileVO>> list(
-            @RequestParam(required = false) Long stationId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "stationId", required = false) Long stationId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         return Result.success(chargingPileService.listForOperator(operatorId, stationId, page, size));
     }
@@ -39,7 +39,7 @@ public class OperatorPileController {
     }
 
     @PutMapping("/api/operator/pile/{id}")
-    public Result<Void> update(@PathVariable Long id,
+    public Result<Void> update(@PathVariable("id") Long id,
                                @RequestBody PileUpdateRequest request) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         chargingPileService.update(operatorId, id, request);
@@ -47,14 +47,14 @@ public class OperatorPileController {
     }
 
     @DeleteMapping("/api/operator/pile/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
+    public Result<Void> delete(@PathVariable("id") Long id) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         chargingPileService.delete(operatorId, id);
         return Result.success("充电桩删除成功", null);
     }
 
     @PutMapping("/api/operator/pile/{id}/status")
-    public Result<Void> updateStatus(@PathVariable Long id,
+    public Result<Void> updateStatus(@PathVariable("id") Long id,
                                      @Valid @RequestBody PileStatusRequest request) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         chargingPileService.updateStatus(operatorId, id, request);
@@ -62,7 +62,7 @@ public class OperatorPileController {
     }
 
     @GetMapping("/api/operator/gun/list/{pileId}")
-    public Result<List<GunVO>> listGuns(@PathVariable Long pileId) {
+    public Result<List<GunVO>> listGuns(@PathVariable("pileId") Long pileId) {
         return Result.success(chargingPileService.listGuns(pileId));
     }
 
@@ -74,7 +74,7 @@ public class OperatorPileController {
     }
 
     @DeleteMapping("/api/operator/gun/{id}")
-    public Result<Void> deleteGun(@PathVariable Long id) {
+    public Result<Void> deleteGun(@PathVariable("id") Long id) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         chargingPileService.deleteGun(operatorId, id);
         return Result.success("充电枪删除成功", null);

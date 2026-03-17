@@ -11,7 +11,7 @@ public interface AdminService {
 
     void updateUserStatus(Long userId, Integer status);
 
-    Page<UserManageVO> listOperators(int page, int size);
+    Page<UserManageVO> listOperators(String keyword, int page, int size);
 
     Page<AnnouncementVO> listAnnouncements(int page, int size);
 

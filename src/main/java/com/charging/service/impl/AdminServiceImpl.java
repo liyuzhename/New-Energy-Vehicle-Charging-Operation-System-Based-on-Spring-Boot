@@ -53,9 +53,16 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<UserManageVO> listOperators(int page, int size) {
-        Page<User> userPage = userMapper.selectPage(new Page<>(page, size),
-                new LambdaQueryWrapper<User>().eq(User::getRole, "OPERATOR").orderByDesc(User::getCreateTime));
+    public Page<UserManageVO> listOperators(String keyword, int page, int size) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<User>()
+                .eq(User::getRole, "OPERATOR")
+                .orderByDesc(User::getCreateTime);
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(User::getUsername, keyword)
+                    .or().like(User::getPhone, keyword)
+                    .or().like(User::getEmail, keyword));
+        }
+        Page<User> userPage = userMapper.selectPage(new Page<>(page, size), wrapper);
         Page<UserManageVO> voPage = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
         voPage.setRecords(userPage.getRecords().stream().map(u -> {
             UserManageVO vo = new UserManageVO();

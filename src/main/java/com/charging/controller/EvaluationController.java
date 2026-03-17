@@ -26,22 +26,31 @@ public class EvaluationController {
 
     @GetMapping("/api/evaluation/station/{stationId}")
     public Result<Page<EvaluationVO>> listByStation(
-            @PathVariable Long stationId,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @PathVariable("stationId") Long stationId,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         return Result.success(evaluationService.listByStation(stationId, page, size));
     }
 
     @PutMapping("/api/operator/evaluation/{id}/reply")
-    public Result<Void> reply(@PathVariable Long id,
+    public Result<Void> reply(@PathVariable("id") Long id,
                               @Valid @RequestBody EvaluationReplyRequest request) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         evaluationService.reply(operatorId, id, request);
         return Result.success("回复成功", null);
     }
 
+    @GetMapping("/api/admin/evaluation/list")
+    public Result<Page<EvaluationVO>> listAll(
+            @RequestParam(value = "rating", required = false) Integer rating,
+            @RequestParam(value = "isHidden", required = false) Integer isHidden,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return Result.success(evaluationService.listAll(rating, isHidden, page, size));
+    }
+
     @PutMapping("/api/admin/evaluation/{id}/hide")
-    public Result<Void> hide(@PathVariable Long id) {
+    public Result<Void> hide(@PathVariable("id") Long id) {
         evaluationService.hide(id);
         return Result.success("评价已屏蔽", null);
     }

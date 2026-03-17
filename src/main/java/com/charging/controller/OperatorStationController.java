@@ -26,7 +26,7 @@ public class OperatorStationController {
     }
 
     @PutMapping("/{id}")
-    public Result<Void> update(@PathVariable Long id,
+    public Result<Void> update(@PathVariable("id") Long id,
                                @RequestBody StationUpdateRequest request) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         chargingStationService.update(operatorId, id, request);
@@ -34,7 +34,7 @@ public class OperatorStationController {
     }
 
     @DeleteMapping("/{id}")
-    public Result<Void> delete(@PathVariable Long id) {
+    public Result<Void> delete(@PathVariable("id") Long id) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         chargingStationService.delete(operatorId, id);
         return Result.success("充电站删除成功", null);
@@ -42,8 +42,8 @@ public class OperatorStationController {
 
     @GetMapping("/list")
     public Result<Page<StationVO>> list(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         String role = SecurityUtils.getCurrentUserRole();
         return Result.success(chargingStationService.listForOperatorOrAdmin(operatorId, role, page, size));

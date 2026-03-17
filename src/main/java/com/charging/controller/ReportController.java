@@ -25,8 +25,10 @@ public class ReportController {
 
     @GetMapping("/order-trend")
     public Result<List<Map<String, Object>>> orderTrend(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        if (endDate == null) endDate = LocalDate.now();
+        if (startDate == null) startDate = endDate.minusDays(29);
         Long operatorId = null;
         String role = SecurityUtils.getCurrentUserRole();
         if ("OPERATOR".equals(role)) operatorId = SecurityUtils.getCurrentUserId();
@@ -35,8 +37,10 @@ public class ReportController {
 
     @GetMapping("/income")
     public Result<List<Map<String, Object>>> income(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        if (endDate == null) endDate = LocalDate.now();
+        if (startDate == null) startDate = endDate.minusDays(29);
         Long operatorId = null;
         String role = SecurityUtils.getCurrentUserRole();
         if ("OPERATOR".equals(role)) operatorId = SecurityUtils.getCurrentUserId();
@@ -45,8 +49,10 @@ public class ReportController {
 
     @GetMapping("/pile-usage")
     public Result<List<Map<String, Object>>> pileUsage(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        if (endDate == null) endDate = LocalDate.now();
+        if (startDate == null) startDate = endDate.minusDays(29);
         Long operatorId = null;
         String role = SecurityUtils.getCurrentUserRole();
         if ("OPERATOR".equals(role)) operatorId = SecurityUtils.getCurrentUserId();

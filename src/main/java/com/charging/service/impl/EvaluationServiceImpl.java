@@ -66,6 +66,22 @@ public class EvaluationServiceImpl implements EvaluationService {
     }
 
     @Override
+    public Page<EvaluationVO> listAll(Integer rating, Integer isHidden, int page, int size) {
+        LambdaQueryWrapper<Evaluation> wrapper = new LambdaQueryWrapper<Evaluation>()
+                .orderByDesc(Evaluation::getCreateTime);
+        if (rating != null) wrapper.eq(Evaluation::getRating, rating);
+        if (isHidden != null) wrapper.eq(Evaluation::getIsHidden, isHidden);
+        Page<Evaluation> pageResult = evaluationMapper.selectPage(new Page<>(page, size), wrapper);
+        Page<EvaluationVO> voPage = new Page<>(pageResult.getCurrent(), pageResult.getSize(), pageResult.getTotal());
+        voPage.setRecords(pageResult.getRecords().stream().map(e -> {
+            EvaluationVO vo = new EvaluationVO();
+            BeanUtils.copyProperties(e, vo);
+            return vo;
+        }).toList());
+        return voPage;
+    }
+
+    @Override
     public void reply(Long operatorId, Long evaluationId, EvaluationReplyRequest request) {
         Evaluation evaluation = evaluationMapper.selectById(evaluationId);
         if (evaluation == null) throw new BusinessException(404, "评价不存在");

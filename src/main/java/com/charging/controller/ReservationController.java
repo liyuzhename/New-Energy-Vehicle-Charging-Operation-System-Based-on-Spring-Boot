@@ -26,9 +26,9 @@ public class ReservationController {
 
     @GetMapping("/my")
     public Result<Page<ReservationVO>> listMy(
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
         Long userId = SecurityUtils.getCurrentUserId();
         return Result.success(reservationService.listMy(userId, status, page, size));
     }
