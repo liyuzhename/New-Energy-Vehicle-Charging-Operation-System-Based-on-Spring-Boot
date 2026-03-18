@@ -31,8 +31,15 @@ public class JwtUtils {
      * 生成 JWT Token
      */
     public String generateToken(Long userId, String username, String role) {
+        return generateToken(userId, username, role, expiration);
+    }
+
+    /**
+     * 生成 JWT Token（自定义过期时间）
+     */
+    public String generateToken(Long userId, String username, String role, long expirationMs) {
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expiration);
+        Date expiryDate = new Date(now.getTime() + expirationMs);
         return Jwts.builder()
                 .subject(String.valueOf(userId))
                 .claim("username", username)

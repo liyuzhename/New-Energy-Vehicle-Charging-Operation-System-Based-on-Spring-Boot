@@ -85,7 +85,9 @@ public class UserServiceImpl implements UserService {
         if (user.getStatus() == 0) {
             throw new BusinessException(403, "账号已被禁用，请联系管理员");
         }
-        String token = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getRole());
+        // 记住密码：7 天有效期；否则默认 1 天
+        long expirationMs = request.isRememberMe() ? 7L * 24 * 60 * 60 * 1000 : 24L * 60 * 60 * 1000;
+        String token = jwtUtils.generateToken(user.getId(), user.getUsername(), user.getRole(), expirationMs);
         return new LoginVO(token, user.getId(), user.getUsername(), user.getRole());
     }
 
