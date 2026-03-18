@@ -58,9 +58,10 @@ public class AdminController {
 
     @GetMapping("/announcement/list")
     public Result<Page<AnnouncementVO>> listAnnouncements(
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        return Result.success(adminService.listAnnouncements(page, size));
+        return Result.success(adminService.listAnnouncements(keyword, page, size));
     }
 
     @PostMapping("/announcement")
