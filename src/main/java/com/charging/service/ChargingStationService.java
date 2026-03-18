@@ -18,5 +18,5 @@ public interface ChargingStationService {
 
     void delete(Long operatorId, Long stationId);
 
-    Page<StationVO> listForOperatorOrAdmin(Long operatorId, String role, int page, int size);
+    Page<StationVO> listForOperatorOrAdmin(Long operatorId, String role, String keyword, int page, int size);
 }

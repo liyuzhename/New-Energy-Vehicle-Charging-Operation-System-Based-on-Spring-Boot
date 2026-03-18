@@ -82,12 +82,17 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     }
 
     @Override
-    public Page<StationVO> listForOperatorOrAdmin(Long operatorId, String role, int page, int size) {
+    public Page<StationVO> listForOperatorOrAdmin(Long operatorId, String role, String keyword, int page, int size) {
         Page<ChargingStation> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<ChargingStation> wrapper = new LambdaQueryWrapper<ChargingStation>()
                 .orderByDesc(ChargingStation::getCreateTime);
         if (!"ADMIN".equals(role)) {
             wrapper.eq(ChargingStation::getOperatorId, operatorId);
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(ChargingStation::getName, keyword)
+                    .or().like(ChargingStation::getAddress, keyword)
+                    .or().like(ChargingStation::getCity, keyword));
         }
         Page<ChargingStation> stationPage = chargingStationMapper.selectPage(pageParam, wrapper);
 
