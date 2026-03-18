@@ -43,10 +43,11 @@ public class OperatorStationController {
     @GetMapping("/list")
     public Result<Page<StationVO>> list(
             @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
         String role = SecurityUtils.getCurrentUserRole();
-        return Result.success(chargingStationService.listForOperatorOrAdmin(operatorId, role, keyword, page, size));
+        return Result.success(chargingStationService.listForOperatorOrAdmin(operatorId, role, keyword, status, page, size));
     }
 }
