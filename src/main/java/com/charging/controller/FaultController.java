@@ -9,8 +9,10 @@ import com.charging.service.FaultRecordService;
 import com.charging.vo.FaultRecordVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -35,10 +37,12 @@ public class FaultController {
     @GetMapping("/api/operator/fault/list")
     public Result<Page<FaultRecordVO>> listForOperator(
             @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
-        return Result.success(faultRecordService.listForOperator(operatorId, status, page, size));
+        return Result.success(faultRecordService.listForOperator(operatorId, status, startDate, endDate, page, size));
     }
 
     @PutMapping("/api/operator/fault/{id}/handle")
@@ -52,8 +56,10 @@ public class FaultController {
     @GetMapping("/api/admin/fault/list")
     public Result<Page<FaultRecordVO>> listForAdmin(
             @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        return Result.success(faultRecordService.listForAdmin(status, page, size));
+        return Result.success(faultRecordService.listForAdmin(status, startDate, endDate, page, size));
     }
 }

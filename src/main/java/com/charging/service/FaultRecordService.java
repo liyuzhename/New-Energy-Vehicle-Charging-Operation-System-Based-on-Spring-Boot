@@ -5,6 +5,7 @@ import com.charging.dto.FaultCreateRequest;
 import com.charging.dto.FaultHandleRequest;
 import com.charging.vo.FaultRecordVO;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface FaultRecordService {
@@ -13,9 +14,9 @@ public interface FaultRecordService {
 
     List<FaultRecordVO> listMy(Long userId);
 
-    Page<FaultRecordVO> listForOperator(Long operatorId, String status, int page, int size);
+    Page<FaultRecordVO> listForOperator(Long operatorId, String status, LocalDate startDate, LocalDate endDate, int page, int size);
 
     void handle(Long operatorId, Long faultId, FaultHandleRequest request);
 
-    Page<FaultRecordVO> listForAdmin(String status, int page, int size);
+    Page<FaultRecordVO> listForAdmin(String status, LocalDate startDate, LocalDate endDate, int page, int size);
 }

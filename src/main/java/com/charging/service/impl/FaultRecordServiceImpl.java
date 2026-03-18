@@ -16,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,7 +57,7 @@ public class FaultRecordServiceImpl implements FaultRecordService {
     }
 
     @Override
-    public Page<FaultRecordVO> listForOperator(Long operatorId, String status, int page, int size) {
+    public Page<FaultRecordVO> listForOperator(Long operatorId, String status, LocalDate startDate, LocalDate endDate, int page, int size) {
         List<Long> pileIds = pileMapper.selectList(
                 new LambdaQueryWrapper<ChargingPile>().eq(ChargingPile::getOperatorId, operatorId))
                 .stream().map(ChargingPile::getId).toList();
@@ -65,6 +67,8 @@ public class FaultRecordServiceImpl implements FaultRecordService {
                 .in(FaultRecord::getPileId, pileIds)
                 .orderByDesc(FaultRecord::getCreateTime);
         if (status != null && !status.isEmpty()) wrapper.eq(FaultRecord::getStatus, status);
+        if (startDate != null) wrapper.ge(FaultRecord::getCreateTime, startDate.atStartOfDay());
+        if (endDate != null) wrapper.le(FaultRecord::getCreateTime, endDate.atTime(23, 59, 59));
         return toVoPage(faultRecordMapper.selectPage(new Page<>(page, size), wrapper));
     }
 
@@ -91,10 +95,12 @@ public class FaultRecordServiceImpl implements FaultRecordService {
     }
 
     @Override
-    public Page<FaultRecordVO> listForAdmin(String status, int page, int size) {
+    public Page<FaultRecordVO> listForAdmin(String status, LocalDate startDate, LocalDate endDate, int page, int size) {
         LambdaQueryWrapper<FaultRecord> wrapper = new LambdaQueryWrapper<FaultRecord>()
                 .orderByDesc(FaultRecord::getCreateTime);
         if (status != null && !status.isEmpty()) wrapper.eq(FaultRecord::getStatus, status);
+        if (startDate != null) wrapper.ge(FaultRecord::getCreateTime, startDate.atStartOfDay());
+        if (endDate != null) wrapper.le(FaultRecord::getCreateTime, endDate.atTime(23, 59, 59));
         return toVoPage(faultRecordMapper.selectPage(new Page<>(page, size), wrapper));
     }
 
