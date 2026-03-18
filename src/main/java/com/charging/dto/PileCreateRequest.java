@@ -19,4 +19,7 @@ public class PileCreateRequest {
     private String pileType;
 
     private BigDecimal power;
+
+    /** 初始状态，不传则默认 IDLE（空闲/营业中） */
+    private String status;
 }

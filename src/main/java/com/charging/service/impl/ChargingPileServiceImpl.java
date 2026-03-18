@@ -47,13 +47,17 @@ public class ChargingPileServiceImpl implements ChargingPileService {
     }
 
     @Override
-    public Page<PileVO> listForOperator(Long operatorId, Long stationId, int page, int size) {
+    public Page<PileVO> listForOperator(Long operatorId, Long stationId, String keyword, int page, int size) {
         Page<ChargingPile> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<ChargingPile> wrapper = new LambdaQueryWrapper<ChargingPile>()
                 .eq(ChargingPile::getOperatorId, operatorId)
                 .orderByDesc(ChargingPile::getCreateTime);
         if (stationId != null) {
             wrapper.eq(ChargingPile::getStationId, stationId);
+        }
+        if (keyword != null && !keyword.isBlank()) {
+            wrapper.and(w -> w.like(ChargingPile::getPileNo, keyword)
+                    .or().like(ChargingPile::getPileType, keyword));
         }
         Page<ChargingPile> pilePage = chargingPileMapper.selectPage(pageParam, wrapper);
 
@@ -77,7 +81,13 @@ public class ChargingPileServiceImpl implements ChargingPileService {
         ChargingPile pile = new ChargingPile();
         BeanUtils.copyProperties(request, pile);
         pile.setOperatorId(operatorId);
-        pile.setStatus("IDLE");
+        // 若前端传入了合法的初始状态则使用，否则默认 IDLE
+        String initStatus = request.getStatus();
+        if (initStatus != null && ALLOWED_STATUS.contains(initStatus)) {
+            pile.setStatus(initStatus);
+        } else {
+            pile.setStatus("IDLE");
+        }
         chargingPileMapper.insert(pile);
     }
 
