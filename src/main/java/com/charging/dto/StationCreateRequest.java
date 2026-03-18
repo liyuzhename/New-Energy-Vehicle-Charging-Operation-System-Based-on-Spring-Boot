@@ -23,4 +23,7 @@ public class StationCreateRequest {
     private String businessHours;
 
     private String parkingFee;
+
+    /** 初始状态，不传则默认 ONLINE（营业中） */
+    private String status;
 }

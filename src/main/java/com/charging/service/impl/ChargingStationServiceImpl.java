@@ -57,7 +57,13 @@ public class ChargingStationServiceImpl implements ChargingStationService {
         ChargingStation station = new ChargingStation();
         BeanUtils.copyProperties(request, station);
         station.setOperatorId(operatorId);
-        station.setStatus("ONLINE");
+        // 若前端传入了合法状态则使用，否则默认 ONLINE
+        String initStatus = request.getStatus();
+        if ("ONLINE".equals(initStatus) || "OFFLINE".equals(initStatus)) {
+            station.setStatus(initStatus);
+        } else {
+            station.setStatus("ONLINE");
+        }
         chargingStationMapper.insert(station);
     }
 
