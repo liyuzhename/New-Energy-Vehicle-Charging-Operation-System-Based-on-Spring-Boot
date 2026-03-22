@@ -177,11 +177,15 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     }
 
     @Override
-    public Page<OrderVO> listForOperator(Long operatorId, int page, int size) {
-        return toVoPage(orderMapper.selectPage(new Page<>(page, size),
-                new LambdaQueryWrapper<ChargingOrder>()
-                        .eq(ChargingOrder::getOperatorId, operatorId)
-                        .orderByDesc(ChargingOrder::getCreateTime)));
+    public Page<OrderVO> listForOperator(Long operatorId, String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size) {
+        LambdaQueryWrapper<ChargingOrder> wrapper = new LambdaQueryWrapper<ChargingOrder>()
+                .eq(ChargingOrder::getOperatorId, operatorId)
+                .orderByDesc(ChargingOrder::getCreateTime);
+        if (status != null && !status.isEmpty()) wrapper.eq(ChargingOrder::getStatus, status);
+        if (orderNo != null && !orderNo.isEmpty()) wrapper.like(ChargingOrder::getOrderNo, orderNo);
+        if (startDate != null) wrapper.ge(ChargingOrder::getCreateTime, startDate.atStartOfDay());
+        if (endDate != null) wrapper.lt(ChargingOrder::getCreateTime, endDate.plusDays(1).atStartOfDay());
+        return toVoPage(orderMapper.selectPage(new Page<>(page, size), wrapper));
     }
 
     @Override

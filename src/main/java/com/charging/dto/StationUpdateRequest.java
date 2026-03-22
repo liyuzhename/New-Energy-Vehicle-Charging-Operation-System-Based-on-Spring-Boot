@@ -21,5 +21,9 @@ public class StationUpdateRequest {
 
     private String parkingFee;
 
+    private String contactPhone;
+
+    private String description;
+
     private String status;
 }

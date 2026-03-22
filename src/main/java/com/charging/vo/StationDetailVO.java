@@ -26,6 +26,10 @@ public class StationDetailVO {
 
     private String parkingFee;
 
+    private String contactPhone;
+
+    private String description;
+
     private String status;
 
     private LocalDateTime createTime;

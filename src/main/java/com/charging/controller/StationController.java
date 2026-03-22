@@ -29,12 +29,12 @@ public class StationController {
     }
 
     @GetMapping("/api/station/{id}")
-    public Result<StationDetailVO> detail(@PathVariable Long id) {
+    public Result<StationDetailVO> detail(@PathVariable("id") Long id) {
         return Result.success(chargingStationService.getDetail(id));
     }
 
     @GetMapping("/api/station/{stationId}/piles")
-    public Result<List<PileWithGunsVO>> piles(@PathVariable Long stationId) {
+    public Result<List<PileWithGunsVO>> piles(@PathVariable("stationId") Long stationId) {
         return Result.success(chargingPileService.listByStation(stationId));
     }
 }

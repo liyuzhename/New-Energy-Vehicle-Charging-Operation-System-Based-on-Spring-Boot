@@ -29,6 +29,10 @@ public class ChargingStation {
 
     private String parkingFee;
 
+    private String contactPhone;
+
+    private String description;
+
     private String status;
 
     @TableLogic

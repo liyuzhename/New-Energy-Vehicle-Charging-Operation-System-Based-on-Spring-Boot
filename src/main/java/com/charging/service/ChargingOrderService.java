@@ -20,7 +20,7 @@ public interface ChargingOrderService {
 
     Page<OrderVO> listMy(Long userId, String status, int page, int size);
 
-    Page<OrderVO> listForOperator(Long operatorId, int page, int size);
+    Page<OrderVO> listForOperator(Long operatorId, String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
 
     Page<OrderVO> listForAdmin(String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
 

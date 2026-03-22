@@ -31,13 +31,13 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/stop")
-    public Result<OrderDetailVO> stop(@PathVariable Long orderId) {
+    public Result<OrderDetailVO> stop(@PathVariable("orderId") Long orderId) {
         Long userId = SecurityUtils.getCurrentUserId();
         return Result.success(orderService.stop(userId, orderId));
     }
 
     @GetMapping("/{orderId}")
-    public Result<OrderDetailVO> detail(@PathVariable Long orderId) {
+    public Result<OrderDetailVO> detail(@PathVariable("orderId") Long orderId) {
         return Result.success(orderService.getDetail(orderId));
     }
 
@@ -51,14 +51,14 @@ public class OrderController {
     }
 
     @PostMapping("/{orderId}/refund")
-    public Result<Void> applyRefund(@PathVariable Long orderId) {
+    public Result<Void> applyRefund(@PathVariable("orderId") Long orderId) {
         Long userId = SecurityUtils.getCurrentUserId();
         orderService.applyRefund(userId, orderId);
         return Result.success("退款申请已提交", null);
     }
 
     @PostMapping("/{orderId}/pay")
-    public Result<Void> pay(@PathVariable Long orderId) {
+    public Result<Void> pay(@PathVariable("orderId") Long orderId) {
         Long userId = SecurityUtils.getCurrentUserId();
         orderService.pay(userId, orderId);
         return Result.success("支付成功", null);

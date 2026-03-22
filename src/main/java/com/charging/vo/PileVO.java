@@ -14,6 +14,8 @@ public class PileVO {
 
     private Long stationId;
 
+    private String stationName;
+
     private Long operatorId;
 
     private String pileType;

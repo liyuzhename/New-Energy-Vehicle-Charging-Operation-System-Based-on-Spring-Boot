@@ -32,7 +32,7 @@ public class ChargingStationServiceImpl implements ChargingStationService {
     @Override
     public StationDetailVO getDetail(Long stationId) {
         ChargingStation station = chargingStationMapper.selectById(stationId);
-        if (station == null || station.getDeleted() == 1) {
+        if (station == null || Integer.valueOf(1).equals(station.getDeleted())) {
             throw new BusinessException(404, "充电站不存在");
         }
 
@@ -77,6 +77,8 @@ public class ChargingStationServiceImpl implements ChargingStationService {
         if (request.getLatitude() != null) station.setLatitude(request.getLatitude());
         if (request.getBusinessHours() != null) station.setBusinessHours(request.getBusinessHours());
         if (request.getParkingFee() != null) station.setParkingFee(request.getParkingFee());
+        if (request.getContactPhone() != null) station.setContactPhone(request.getContactPhone());
+        if (request.getDescription() != null) station.setDescription(request.getDescription());
         if (request.getStatus() != null) station.setStatus(request.getStatus());
         chargingStationMapper.updateById(station);
     }

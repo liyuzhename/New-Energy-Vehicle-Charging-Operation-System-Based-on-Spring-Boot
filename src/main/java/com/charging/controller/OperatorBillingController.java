@@ -5,9 +5,12 @@ import com.charging.dto.BillingRuleCreateRequest;
 import com.charging.dto.BillingRuleUpdateRequest;
 import com.charging.security.util.SecurityUtils;
 import com.charging.service.BillingRuleService;
+import com.charging.vo.BillingRuleVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/operator/billing")
@@ -15,6 +18,11 @@ import org.springframework.web.bind.annotation.*;
 public class OperatorBillingController {
 
     private final BillingRuleService billingRuleService;
+
+    @GetMapping
+    public Result<List<BillingRuleVO>> list(@RequestParam("stationId") Long stationId) {
+        return Result.success(billingRuleService.listByStation(stationId));
+    }
 
     @PostMapping
     public Result<Void> create(@Valid @RequestBody BillingRuleCreateRequest request) {

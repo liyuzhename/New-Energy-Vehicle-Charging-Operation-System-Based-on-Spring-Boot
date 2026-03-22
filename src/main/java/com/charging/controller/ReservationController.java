@@ -34,7 +34,7 @@ public class ReservationController {
     }
 
     @PutMapping("/{id}/cancel")
-    public Result<Void> cancel(@PathVariable Long id) {
+    public Result<Void> cancel(@PathVariable("id") Long id) {
         Long userId = SecurityUtils.getCurrentUserId();
         reservationService.cancel(userId, id);
         return Result.success("预约已取消", null);

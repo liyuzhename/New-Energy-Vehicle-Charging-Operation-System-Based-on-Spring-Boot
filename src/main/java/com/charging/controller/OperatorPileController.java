@@ -25,10 +25,11 @@ public class OperatorPileController {
     @GetMapping("/api/operator/pile/list")
     public Result<Page<PileVO>> list(
             @RequestParam(value = "stationId", required = false) Long stationId,
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
-        return Result.success(chargingPileService.listForOperator(operatorId, stationId, page, size));
+        return Result.success(chargingPileService.listForOperator(operatorId, stationId, keyword, page, size));
     }
 
     @PostMapping("/api/operator/pile")

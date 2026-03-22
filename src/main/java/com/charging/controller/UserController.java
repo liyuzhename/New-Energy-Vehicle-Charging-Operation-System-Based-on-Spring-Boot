@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @DeleteMapping("/vehicles/{id}")
-    public Result<Void> unbindVehicle(@PathVariable Long id) {
+    public Result<Void> unbindVehicle(@PathVariable("id") Long id) {
         Long userId = SecurityUtils.getCurrentUserId();
         userService.unbindVehicle(userId, id);
         return Result.success("车辆解绑成功", null);

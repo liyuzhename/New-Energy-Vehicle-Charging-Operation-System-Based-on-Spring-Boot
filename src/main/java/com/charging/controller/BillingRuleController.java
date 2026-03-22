@@ -19,7 +19,7 @@ public class BillingRuleController {
     private final BillingRuleService billingRuleService;
 
     @GetMapping("/list/{stationId}")
-    public Result<List<BillingRuleVO>> list(@PathVariable Long stationId) {
+    public Result<List<BillingRuleVO>> list(@PathVariable("stationId") Long stationId) {
         return Result.success(billingRuleService.listByStation(stationId));
     }
 }

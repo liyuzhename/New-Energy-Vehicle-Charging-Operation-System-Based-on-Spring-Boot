@@ -9,8 +9,10 @@ import com.charging.dto.PileStatusRequest;
 import com.charging.dto.PileUpdateRequest;
 import com.charging.entity.ChargingGun;
 import com.charging.entity.ChargingPile;
+import com.charging.entity.ChargingStation;
 import com.charging.mapper.ChargingGunMapper;
 import com.charging.mapper.ChargingPileMapper;
+import com.charging.mapper.ChargingStationMapper;
 import com.charging.service.ChargingPileService;
 import com.charging.vo.GunVO;
 import com.charging.vo.PileVO;
@@ -28,6 +30,7 @@ public class ChargingPileServiceImpl implements ChargingPileService {
 
     private final ChargingPileMapper chargingPileMapper;
     private final ChargingGunMapper chargingGunMapper;
+    private final ChargingStationMapper chargingStationMapper;
 
     private static final List<String> ALLOWED_STATUS = Arrays.asList("IDLE", "FAULT", "OFFLINE");
 
@@ -65,6 +68,12 @@ public class ChargingPileServiceImpl implements ChargingPileService {
         voPage.setRecords(pilePage.getRecords().stream().map(p -> {
             PileVO vo = new PileVO();
             BeanUtils.copyProperties(p, vo);
+            if (p.getStationId() != null) {
+                ChargingStation station = chargingStationMapper.selectById(p.getStationId());
+                if (station != null) {
+                    vo.setStationName(station.getName());
+                }
+            }
             return vo;
         }).toList());
         return voPage;
@@ -102,6 +111,16 @@ public class ChargingPileServiceImpl implements ChargingPileService {
                 throw new BusinessException(400, "桩编号已存在");
             }
             pile.setPileNo(request.getPileNo());
+        }
+        if (request.getStationId() != null && !request.getStationId().equals(pile.getStationId())) {
+            ChargingStation station = chargingStationMapper.selectById(request.getStationId());
+            if (station == null) {
+                throw new BusinessException(404, "目标充电站不存在");
+            }
+            if (!station.getOperatorId().equals(operatorId)) {
+                throw new BusinessException(403, "无权将充电桩移至该充电站");
+            }
+            pile.setStationId(request.getStationId());
         }
         if (request.getPileType() != null) pile.setPileType(request.getPileType());
         if (request.getPower() != null) pile.setPower(request.getPower());
