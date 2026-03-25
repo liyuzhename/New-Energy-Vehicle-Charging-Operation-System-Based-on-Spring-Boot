@@ -47,8 +47,20 @@ public class ChargingStationServiceImpl implements ChargingStationService {
                         .eq(ChargingPile::getStationId, stationId)
                         .eq(ChargingPile::getStatus, "IDLE")
         );
+        long occupiedPileCount = chargingPileMapper.selectCount(
+                new LambdaQueryWrapper<ChargingPile>()
+                        .eq(ChargingPile::getStationId, stationId)
+                        .eq(ChargingPile::getStatus, "OCCUPIED")
+        );
+        long faultPileCount = chargingPileMapper.selectCount(
+                new LambdaQueryWrapper<ChargingPile>()
+                        .eq(ChargingPile::getStationId, stationId)
+                        .eq(ChargingPile::getStatus, "FAULT")
+        );
         vo.setTotalPileCount((int) totalPileCount);
         vo.setAvailablePileCount((int) availablePileCount);
+        vo.setOccupiedPileCount((int) occupiedPileCount);
+        vo.setFaultPileCount((int) faultPileCount);
         return vo;
     }
 

@@ -36,5 +36,9 @@ public class StationDetailVO {
 
     private Integer availablePileCount;
 
+    private Integer occupiedPileCount;
+
+    private Integer faultPileCount;
+
     private Integer totalPileCount;
 }
