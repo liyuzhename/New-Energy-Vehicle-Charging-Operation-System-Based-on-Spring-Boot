@@ -122,6 +122,9 @@ public class UserServiceImpl implements UserService {
         if (request.getAvatar() != null) {
             user.setAvatar(request.getAvatar());
         }
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
         userMapper.updateById(user);
     }
 
