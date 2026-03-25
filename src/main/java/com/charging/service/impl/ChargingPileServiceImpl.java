@@ -50,7 +50,7 @@ public class ChargingPileServiceImpl implements ChargingPileService {
     }
 
     @Override
-    public Page<PileVO> listForOperator(Long operatorId, Long stationId, String keyword, int page, int size) {
+    public Page<PileVO> listForOperator(Long operatorId, Long stationId, String keyword, String status, int page, int size) {
         Page<ChargingPile> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<ChargingPile> wrapper = new LambdaQueryWrapper<ChargingPile>()
                 .eq(ChargingPile::getOperatorId, operatorId)
@@ -61,6 +61,9 @@ public class ChargingPileServiceImpl implements ChargingPileService {
         if (keyword != null && !keyword.isBlank()) {
             wrapper.and(w -> w.like(ChargingPile::getPileNo, keyword)
                     .or().like(ChargingPile::getPileType, keyword));
+        }
+        if (status != null && !status.isBlank()) {
+            wrapper.eq(ChargingPile::getStatus, status);
         }
         Page<ChargingPile> pilePage = chargingPileMapper.selectPage(pageParam, wrapper);
 

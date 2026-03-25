@@ -15,7 +15,7 @@ public interface ChargingPileService {
 
     List<PileWithGunsVO> listByStation(Long stationId);
 
-    Page<PileVO> listForOperator(Long operatorId, Long stationId, String keyword, int page, int size);
+    Page<PileVO> listForOperator(Long operatorId, Long stationId, String keyword, String status, int page, int size);
 
     void create(Long operatorId, PileCreateRequest request);
 
