@@ -146,14 +146,17 @@ public class ChargingPileServiceImpl implements ChargingPileService {
     @Override
     public void addGun(Long operatorId, GunCreateRequest request) {
         ChargingPile pile = getOwnedPile(operatorId, request.getPileId());
-        // 自动生成枪口编号：G + 两位序号，如 G01、G02
-        long existingCount = chargingGunMapper.selectCount(
-                new LambdaQueryWrapper<ChargingGun>().eq(ChargingGun::getPileId, request.getPileId())
+        // 校验枪口编号在该桩下唯一
+        long count = chargingGunMapper.selectCount(
+                new LambdaQueryWrapper<ChargingGun>()
+                        .eq(ChargingGun::getPileId, request.getPileId())
+                        .eq(ChargingGun::getGunNo, request.getGunNo())
         );
-        String gunNo = "G" + String.format("%02d", existingCount + 1);
+        if (count > 0) {
+            throw new BusinessException(400, "枪口编号已存在");
+        }
         ChargingGun gun = new ChargingGun();
         BeanUtils.copyProperties(request, gun);
-        gun.setGunNo(gunNo);
         gun.setStatus("IDLE");
         chargingGunMapper.insert(gun);
     }

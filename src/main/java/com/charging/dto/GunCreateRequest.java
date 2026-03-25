@@ -12,6 +12,9 @@ public class GunCreateRequest {
     @NotNull(message = "充电桩ID不能为空")
     private Long pileId;
 
+    @NotBlank(message = "枪口编号不能为空")
+    private String gunNo;
+
     @NotBlank(message = "枪类型不能为空")
     private String gunType;
 
