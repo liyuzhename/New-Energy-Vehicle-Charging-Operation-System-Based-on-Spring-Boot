@@ -48,7 +48,13 @@ public class BillingRuleServiceImpl implements BillingRuleService {
     @Override
     public void create(Long operatorId, BillingRuleCreateRequest request) {
         checkStationOwnership(operatorId, request.getStationId());
-        checkTimeOverlap(request.getStationId(), null, request.getStartHour(), request.getEndHour());
+        // endHour=0 视为 24（当天结束）
+        int endHour = (request.getEndHour() == 0) ? 24 : request.getEndHour();
+        if (endHour <= request.getStartHour()) {
+            throw new BusinessException(400, "结束时间必须晚于开始时间（如需设置到24:00，请选择00:00）");
+        }
+        request.setEndHour(endHour);
+        checkTimeOverlap(request.getStationId(), null, request.getStartHour(), endHour);
 
         BillingRule rule = new BillingRule();
         BeanUtils.copyProperties(request, rule);
@@ -61,13 +67,20 @@ public class BillingRuleServiceImpl implements BillingRuleService {
         BillingRule rule = getOwnedRule(operatorId, id);
         if (request.getPeriodType() != null) rule.setPeriodType(request.getPeriodType());
         if (request.getStartHour() != null) rule.setStartHour(request.getStartHour());
-        if (request.getEndHour() != null) rule.setEndHour(request.getEndHour());
+        if (request.getEndHour() != null) {
+            // endHour=0 视为 24（当天结束）
+            int endHour = (request.getEndHour() == 0) ? 24 : request.getEndHour();
+            rule.setEndHour(endHour);
+        }
         if (request.getElectricityPrice() != null) rule.setElectricityPrice(request.getElectricityPrice());
         if (request.getServicePrice() != null) rule.setServicePrice(request.getServicePrice());
         if (request.getEffectiveDate() != null) rule.setEffectiveDate(request.getEffectiveDate());
 
         int newStart = rule.getStartHour();
         int newEnd = rule.getEndHour();
+        if (newEnd <= newStart) {
+            throw new BusinessException(400, "结束时间必须晚于开始时间（如需设置到24:00，请选择00:00）");
+        }
         checkTimeOverlap(rule.getStationId(), id, newStart, newEnd);
         billingRuleMapper.updateById(rule);
     }
