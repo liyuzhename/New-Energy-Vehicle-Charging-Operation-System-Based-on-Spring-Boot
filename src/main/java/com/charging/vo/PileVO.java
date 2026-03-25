@@ -24,5 +24,7 @@ public class PileVO {
 
     private String status;
 
+    private Integer gunCount;
+
     private LocalDateTime createTime;
 }

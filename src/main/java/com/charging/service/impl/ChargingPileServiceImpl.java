@@ -74,6 +74,10 @@ public class ChargingPileServiceImpl implements ChargingPileService {
                     vo.setStationName(station.getName());
                 }
             }
+            long gunCount = chargingGunMapper.selectCount(
+                    new LambdaQueryWrapper<ChargingGun>().eq(ChargingGun::getPileId, p.getId())
+            );
+            vo.setGunCount((int) gunCount);
             return vo;
         }).toList());
         return voPage;
