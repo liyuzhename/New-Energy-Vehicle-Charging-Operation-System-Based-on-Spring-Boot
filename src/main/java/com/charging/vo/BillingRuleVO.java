@@ -20,6 +20,12 @@ public class BillingRuleVO {
 
     private Integer endHour;
 
+    /** 格式化时间段，如 "08:00-18:00"，endHour=24 显示为 24:00 */
+    public String getTimeRange() {
+        if (startHour == null || endHour == null) return null;
+        return String.format("%02d:00-%02d:00", startHour, endHour);
+    }
+
     private BigDecimal electricityPrice;
 
     private BigDecimal servicePrice;
