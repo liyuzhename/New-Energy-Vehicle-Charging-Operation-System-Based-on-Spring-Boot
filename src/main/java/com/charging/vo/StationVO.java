@@ -35,4 +35,6 @@ public class StationVO {
     private LocalDateTime createTime;
 
     private Integer availablePileCount;
+
+    private Integer totalPileCount;
 }

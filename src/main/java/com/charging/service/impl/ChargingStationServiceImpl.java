@@ -117,6 +117,11 @@ public class ChargingStationServiceImpl implements ChargingStationService {
                             .eq(ChargingPile::getStatus, "IDLE")
             );
             vo.setAvailablePileCount((int) available);
+            long total = chargingPileMapper.selectCount(
+                    new LambdaQueryWrapper<ChargingPile>()
+                            .eq(ChargingPile::getStationId, s.getId())
+            );
+            vo.setTotalPileCount((int) total);
             return vo;
         }).toList());
         return voPage;
