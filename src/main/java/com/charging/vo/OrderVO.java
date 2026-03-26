@@ -45,4 +45,19 @@ public class OrderVO {
 
     /** 预估费用，仅充电中订单返回 */
     private BigDecimal estimatedFee;
+
+    /** 充电站名称 */
+    private String stationName;
+
+    /** 充电桩编号 */
+    private String pileNo;
+
+    /** 充电桩功率（kW） */
+    private BigDecimal power;
+
+    /** 车牌号 */
+    private String plateNo;
+
+    /** 充电时长（秒） */
+    private Long chargeDuration;
 }

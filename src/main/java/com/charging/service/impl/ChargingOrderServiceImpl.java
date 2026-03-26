@@ -7,9 +7,13 @@ import com.charging.dto.StartChargingRequest;
 import com.charging.entity.ChargingGun;
 import com.charging.entity.ChargingOrder;
 import com.charging.entity.ChargingPile;
+import com.charging.entity.ChargingStation;
+import com.charging.entity.Vehicle;
 import com.charging.mapper.ChargingGunMapper;
 import com.charging.mapper.ChargingOrderMapper;
 import com.charging.mapper.ChargingPileMapper;
+import com.charging.mapper.ChargingStationMapper;
+import com.charging.mapper.VehicleMapper;
 import com.charging.service.BillingRuleService;
 import com.charging.service.ChargingOrderService;
 import com.charging.service.WalletService;
@@ -41,6 +45,8 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     private final ChargingGunMapper gunMapper;
     private final BillingRuleService billingRuleService;
     private final WalletService walletService;
+    private final ChargingStationMapper stationMapper;
+    private final VehicleMapper vehicleMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -98,17 +104,33 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
                 new LambdaQueryWrapper<ChargingOrder>()
                         .eq(ChargingOrder::getUserId, userId)
                         .eq(ChargingOrder::getStatus, "CHARGING"));
-        if (order == null) throw new BusinessException(404, "当前没有进行中的充电订单");
+        // 无进行中订单时返回 null，前端轮询时不触发错误弹窗
+        if (order == null) return null;
         OrderVO vo = new OrderVO();
         BeanUtils.copyProperties(order, vo);
         long seconds = Duration.between(order.getStartTime(), LocalDateTime.now()).getSeconds();
         vo.setChargingSeconds(seconds);
-        // 预估费用：按当前时长计算
+        vo.setChargeDuration(seconds);
+
         ChargingPile pile = pileMapper.selectById(order.getPileId());
         if (pile != null) {
+            vo.setPileNo(pile.getPileNo());
+            vo.setPower(pile.getPower());
+            // 实时计算已充电量 = 功率(kW) * 时长(h)
+            BigDecimal hours = BigDecimal.valueOf(seconds).divide(BigDecimal.valueOf(3600), 6, RoundingMode.HALF_UP);
+            vo.setChargeKwh(pile.getPower().multiply(hours).setScale(3, RoundingMode.HALF_UP));
+            // 预估费用
             FeeDetailVO fee = billingRuleService.calculateFee(
                     order.getStationId(), pile.getPower(), order.getStartTime(), LocalDateTime.now());
             vo.setEstimatedFee(fee.getTotalFee());
+        }
+        if (order.getStationId() != null) {
+            ChargingStation station = stationMapper.selectById(order.getStationId());
+            if (station != null) vo.setStationName(station.getName());
+        }
+        if (order.getVehicleId() != null) {
+            Vehicle vehicle = vehicleMapper.selectById(order.getVehicleId());
+            if (vehicle != null) vo.setPlateNo(vehicle.getPlateNo());
         }
         return vo;
     }
@@ -157,8 +179,16 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         if (order == null) throw new BusinessException(404, "订单不存在");
         OrderDetailVO vo = new OrderDetailVO();
         BeanUtils.copyProperties(order, vo);
-        if (order.getEndTime() != null) {
-            ChargingPile pile = pileMapper.selectById(order.getPileId());
+        ChargingPile pile = pileMapper.selectById(order.getPileId());
+        if ("CHARGING".equals(order.getStatus())) {
+            // 进行中订单：实时计算预估费用
+            LocalDateTime now = LocalDateTime.now();
+            FeeDetailVO feeDetail = billingRuleService.calculateFee(
+                    order.getStationId(), pile != null ? pile.getPower() : new BigDecimal("7.0"),
+                    order.getStartTime(), now);
+            vo.setTotalFee(feeDetail.getTotalFee());
+            vo.setFeeDetail(feeDetail);
+        } else if (order.getEndTime() != null) {
             FeeDetailVO feeDetail = billingRuleService.calculateFee(
                     order.getStationId(), pile != null ? pile.getPower() : new BigDecimal("7.0"),
                     order.getStartTime(), order.getEndTime());
@@ -173,7 +203,8 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
                 .eq(ChargingOrder::getUserId, userId)
                 .orderByDesc(ChargingOrder::getCreateTime);
         if (status != null && !status.isEmpty()) wrapper.eq(ChargingOrder::getStatus, status);
-        return toVoPage(orderMapper.selectPage(new Page<>(page, size), wrapper));
+        Page<ChargingOrder> orderPage = orderMapper.selectPage(new Page<>(page, size), wrapper);
+        return toVoPageWithDetails(orderPage);
     }
 
     @Override
@@ -277,6 +308,40 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         voPage.setRecords(page.getRecords().stream().map(o -> {
             OrderVO vo = new OrderVO();
             BeanUtils.copyProperties(o, vo);
+            return vo;
+        }).toList());
+        return voPage;
+    }
+
+    private Page<OrderVO> toVoPageWithDetails(Page<ChargingOrder> page) {
+        Page<OrderVO> voPage = new Page<>(page.getCurrent(), page.getSize(), page.getTotal());
+        voPage.setRecords(page.getRecords().stream().map(o -> {
+            OrderVO vo = new OrderVO();
+            BeanUtils.copyProperties(o, vo);
+            // 充电站名称
+            if (o.getStationId() != null) {
+                ChargingStation station = stationMapper.selectById(o.getStationId());
+                if (station != null) vo.setStationName(station.getName());
+            }
+            // 充电桩编号
+            if (o.getPileId() != null) {
+                ChargingPile pile = pileMapper.selectById(o.getPileId());
+                if (pile != null) {
+                    vo.setPileNo(pile.getPileNo());
+                    vo.setPower(pile.getPower());
+                }
+            }
+            // 车牌号
+            if (o.getVehicleId() != null) {
+                Vehicle vehicle = vehicleMapper.selectById(o.getVehicleId());
+                if (vehicle != null) vo.setPlateNo(vehicle.getPlateNo());
+            }
+            // 充电时长（秒）
+            if (o.getStartTime() != null && o.getEndTime() != null) {
+                vo.setChargeDuration(Duration.between(o.getStartTime(), o.getEndTime()).getSeconds());
+            } else if (o.getStartTime() != null && "CHARGING".equals(o.getStatus())) {
+                vo.setChargeDuration(Duration.between(o.getStartTime(), LocalDateTime.now()).getSeconds());
+            }
             return vo;
         }).toList());
         return voPage;
