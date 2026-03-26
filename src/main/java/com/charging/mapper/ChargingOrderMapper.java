@@ -48,30 +48,34 @@ public interface ChargingOrderMapper extends BaseMapper<ChargingOrder> {
                                                      @Param("endDate") LocalDate endDate);
 
     /**
-     * 按时间粒度统计订单数（管理员全平台或运营商名下）
+     * 按时间粒度统计订单数（管理员全平台或运营商名下），支持按充电站过滤
      */
     @Select("<script>" +
             "SELECT DATE(start_time) AS period, COUNT(*) AS orderCount " +
             "FROM charging_order WHERE deleted = 0 AND status = 'FINISHED' " +
             "<if test='operatorId != null'>AND operator_id = #{operatorId} </if>" +
+            "<if test='stationId != null'>AND station_id = #{stationId} </if>" +
             "AND start_time >= #{startDate} AND start_time &lt; #{endDate} " +
             "GROUP BY DATE(start_time) ORDER BY period" +
             "</script>")
     List<Map<String, Object>> selectOrderTrend(@Param("operatorId") Long operatorId,
+                                                @Param("stationId") Long stationId,
                                                 @Param("startDate") LocalDate startDate,
                                                 @Param("endDate") LocalDate endDate);
 
     /**
-     * 统计各充电桩被占用的订单数（用于利用率分析）
+     * 统计各充电桩被占用的订单数（用于利用率分析），支持按充电站过滤
      */
     @Select("<script>" +
             "SELECT pile_id AS pileId, COUNT(*) AS orderCount, SUM(TIMESTAMPDIFF(MINUTE, start_time, IFNULL(end_time, NOW()))) AS occupiedMinutes " +
             "FROM charging_order WHERE deleted = 0 " +
             "<if test='operatorId != null'>AND operator_id = #{operatorId} </if>" +
+            "<if test='stationId != null'>AND station_id = #{stationId} </if>" +
             "AND start_time >= #{startDate} AND start_time &lt; #{endDate} " +
             "GROUP BY pile_id" +
             "</script>")
     List<Map<String, Object>> selectPileUsage(@Param("operatorId") Long operatorId,
+                                               @Param("stationId") Long stationId,
                                                @Param("startDate") LocalDate startDate,
                                                @Param("endDate") LocalDate endDate);
 }

@@ -25,6 +25,7 @@ public class ReportController {
 
     @GetMapping("/order-trend")
     public Result<List<Map<String, Object>>> orderTrend(
+            @RequestParam(value = "stationId", required = false) Long stationId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         if (endDate == null) endDate = LocalDate.now();
@@ -32,11 +33,12 @@ public class ReportController {
         Long operatorId = null;
         String role = SecurityUtils.getCurrentUserRole();
         if ("OPERATOR".equals(role)) operatorId = SecurityUtils.getCurrentUserId();
-        return Result.success(reportService.orderTrend(operatorId, startDate, endDate));
+        return Result.success(reportService.orderTrend(operatorId, stationId, startDate, endDate));
     }
 
     @GetMapping("/income")
     public Result<List<Map<String, Object>>> income(
+            @RequestParam(value = "stationId", required = false) Long stationId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         if (endDate == null) endDate = LocalDate.now();
@@ -44,11 +46,12 @@ public class ReportController {
         Long operatorId = null;
         String role = SecurityUtils.getCurrentUserRole();
         if ("OPERATOR".equals(role)) operatorId = SecurityUtils.getCurrentUserId();
-        return Result.success(reportService.orderTrend(operatorId, startDate, endDate));
+        return Result.success(reportService.orderTrend(operatorId, stationId, startDate, endDate));
     }
 
     @GetMapping("/pile-usage")
     public Result<List<Map<String, Object>>> pileUsage(
+            @RequestParam(value = "stationId", required = false) Long stationId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         if (endDate == null) endDate = LocalDate.now();
@@ -56,7 +59,7 @@ public class ReportController {
         Long operatorId = null;
         String role = SecurityUtils.getCurrentUserRole();
         if ("OPERATOR".equals(role)) operatorId = SecurityUtils.getCurrentUserId();
-        return Result.success(reportService.pileUsage(operatorId, startDate, endDate));
+        return Result.success(reportService.pileUsage(operatorId, stationId, startDate, endDate));
     }
 
     @GetMapping("/export")

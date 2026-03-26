@@ -36,13 +36,13 @@ public class ReportServiceImpl implements ReportService {
     private final UserMapper userMapper;
 
     @Override
-    public List<Map<String, Object>> orderTrend(Long operatorId, LocalDate startDate, LocalDate endDate) {
-        return orderMapper.selectOrderTrend(operatorId, startDate, endDate.plusDays(1));
+    public List<Map<String, Object>> orderTrend(Long operatorId, Long stationId, LocalDate startDate, LocalDate endDate) {
+        return orderMapper.selectOrderTrend(operatorId, stationId, startDate, endDate.plusDays(1));
     }
 
     @Override
-    public List<Map<String, Object>> pileUsage(Long operatorId, LocalDate startDate, LocalDate endDate) {
-        return orderMapper.selectPileUsage(operatorId, startDate, endDate.plusDays(1));
+    public List<Map<String, Object>> pileUsage(Long operatorId, Long stationId, LocalDate startDate, LocalDate endDate) {
+        return orderMapper.selectPileUsage(operatorId, stationId, startDate, endDate.plusDays(1));
     }
 
     @Override
