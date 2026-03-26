@@ -32,5 +32,5 @@ public interface ChargingOrderService {
 
     void pay(Long userId, Long orderId);
 
-    IncomeVO getIncome(Long operatorId, LocalDate startDate, LocalDate endDate);
+    IncomeVO getIncome(Long operatorId, Long stationId, LocalDate startDate, LocalDate endDate);
 }

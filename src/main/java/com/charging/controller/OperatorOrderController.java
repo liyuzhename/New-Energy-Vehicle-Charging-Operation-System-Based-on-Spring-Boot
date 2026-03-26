@@ -34,9 +34,10 @@ public class OperatorOrderController {
 
     @GetMapping("/income")
     public Result<IncomeVO> income(
+            @RequestParam(value = "stationId", required = false) Long stationId,
             @RequestParam(value = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         Long operatorId = SecurityUtils.getCurrentUserId();
-        return Result.success(orderService.getIncome(operatorId, startDate, endDate));
+        return Result.success(orderService.getIncome(operatorId, stationId, startDate, endDate));
     }
 }

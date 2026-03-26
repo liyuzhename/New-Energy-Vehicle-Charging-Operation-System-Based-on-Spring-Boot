@@ -321,8 +321,10 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     }
 
     @Override
-    public IncomeVO getIncome(Long operatorId, LocalDate startDate, LocalDate endDate) {
-        List<Map<String, Object>> daily = orderMapper.selectDailyIncome(operatorId, startDate, endDate.plusDays(1));
+    public IncomeVO getIncome(Long operatorId, Long stationId, LocalDate startDate, LocalDate endDate) {
+        LocalDate endExclusive = endDate.plusDays(1);
+        // daily：按日聚合，支持 stationId 过滤（用于柱状图）
+        List<Map<String, Object>> daily = orderMapper.selectDailyIncome(operatorId, stationId, startDate, endExclusive);
         BigDecimal totalCharge = BigDecimal.ZERO;
         BigDecimal totalService = BigDecimal.ZERO;
         for (Map<String, Object> row : daily) {
@@ -336,8 +338,10 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         vo.setTotalServiceFee(totalService.setScale(2, RoundingMode.HALF_UP));
         vo.setTotalFee(totalCharge.add(totalService).setScale(2, RoundingMode.HALF_UP));
         vo.setDaily(daily);
-        // 按充电站聚合明细
-        vo.setStationList(orderMapper.selectIncomeByStation(operatorId, startDate, endDate.plusDays(1)));
+        // 按充电站聚合汇总
+        vo.setStationList(orderMapper.selectIncomeByStation(operatorId, stationId, startDate, endExclusive));
+        // 按充电站+日期双维度明细（含日期字段，用于收益明细列表）
+        vo.setDetailList(orderMapper.selectIncomeByStationAndDay(operatorId, stationId, startDate, endExclusive));
         return vo;
     }
 
