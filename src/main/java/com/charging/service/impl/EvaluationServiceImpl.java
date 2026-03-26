@@ -8,9 +8,11 @@ import com.charging.dto.EvaluationReplyRequest;
 import com.charging.entity.ChargingOrder;
 import com.charging.entity.ChargingStation;
 import com.charging.entity.Evaluation;
+import com.charging.entity.User;
 import com.charging.mapper.ChargingOrderMapper;
 import com.charging.mapper.ChargingStationMapper;
 import com.charging.mapper.EvaluationMapper;
+import com.charging.mapper.UserMapper;
 import com.charging.service.EvaluationService;
 import com.charging.vo.EvaluationVO;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class EvaluationServiceImpl implements EvaluationService {
     private final EvaluationMapper evaluationMapper;
     private final ChargingOrderMapper orderMapper;
     private final ChargingStationMapper stationMapper;
+    private final UserMapper userMapper;
 
     @Override
     public void create(Long userId, EvaluationCreateRequest request) {
@@ -59,7 +62,15 @@ public class EvaluationServiceImpl implements EvaluationService {
         voPage.setRecords(pageResult.getRecords().stream().map(e -> {
             EvaluationVO vo = new EvaluationVO();
             BeanUtils.copyProperties(e, vo);
-            vo.setAvgRating(avgRating);
+            vo.setAvgRating(avgRating != null ? avgRating : 0.0);
+            // 关联查询用户昵称和头像
+            if (e.getUserId() != null) {
+                User user = userMapper.selectById(e.getUserId());
+                if (user != null) {
+                    vo.setUserName(user.getNickname() != null ? user.getNickname() : user.getUsername());
+                    vo.setUserAvatar(user.getAvatar());
+                }
+            }
             return vo;
         }).toList());
         return voPage;

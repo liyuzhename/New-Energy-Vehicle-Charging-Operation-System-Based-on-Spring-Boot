@@ -23,4 +23,13 @@ public class ReservationVO {
     private String status;
 
     private LocalDateTime createTime;
+
+    /** 充电站名称 */
+    private String stationName;
+
+    /** 充电桩编号 */
+    private String pileNo;
+
+    /** 车牌号 */
+    private String plateNo;
 }

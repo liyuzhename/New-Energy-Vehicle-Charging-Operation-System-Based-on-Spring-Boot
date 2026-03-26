@@ -26,4 +26,10 @@ public class EvaluationVO {
     private LocalDateTime createTime;
 
     private Double avgRating;
+
+    /** 评价用户昵称 */
+    private String userName;
+
+    /** 评价用户头像 */
+    private String userAvatar;
 }

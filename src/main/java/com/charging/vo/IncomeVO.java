@@ -15,5 +15,9 @@ public class IncomeVO {
 
     private BigDecimal totalFee;
 
+    /** 按日聚合明细 */
     private List<Map<String, Object>> daily;
+
+    /** 按充电站聚合明细 */
+    private List<Map<String, Object>> stationList;
 }

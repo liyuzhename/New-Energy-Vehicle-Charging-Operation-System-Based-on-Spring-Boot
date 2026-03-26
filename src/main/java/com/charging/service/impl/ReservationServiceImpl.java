@@ -1,12 +1,19 @@
 package com.charging.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.charging.common.exception.BusinessException;
 import com.charging.dto.ReservationCreateRequest;
+import com.charging.entity.ChargingPile;
+import com.charging.entity.ChargingStation;
 import com.charging.entity.Reservation;
+import com.charging.entity.Vehicle;
+import com.charging.mapper.ChargingPileMapper;
+import com.charging.mapper.ChargingStationMapper;
 import com.charging.mapper.ReservationMapper;
+import com.charging.mapper.VehicleMapper;
 import com.charging.service.ReservationService;
 import com.charging.vo.ReservationVO;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +31,9 @@ import java.util.List;
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationMapper reservationMapper;
+    private final ChargingPileMapper pileMapper;
+    private final ChargingStationMapper stationMapper;
+    private final VehicleMapper vehicleMapper;
 
     @Override
     public void create(Long userId, ReservationCreateRequest request) {
@@ -70,6 +80,25 @@ public class ReservationServiceImpl implements ReservationService {
         voPage.setRecords(pageResult.getRecords().stream().map(r -> {
             ReservationVO vo = new ReservationVO();
             BeanUtils.copyProperties(r, vo);
+            // 关联充电桩和充电站
+            if (r.getPileId() != null) {
+                ChargingPile pile = pileMapper.selectById(r.getPileId());
+                if (pile != null) {
+                    vo.setPileNo(pile.getPileNo());
+                    if (pile.getStationId() != null) {
+                        ChargingStation station = stationMapper.selectById(pile.getStationId());
+                        if (station != null) vo.setStationName(station.getName());
+                    }
+                }
+            }
+            // 关联用户第一辆车的车牌号
+            if (r.getUserId() != null) {
+                var vehicles = vehicleMapper.selectList(
+                    new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Vehicle>()
+                        .eq(Vehicle::getUserId, r.getUserId())
+                        .last("LIMIT 1"));
+                if (!vehicles.isEmpty()) vo.setPlateNo(vehicles.get(0).getPlateNo());
+            }
             return vo;
         }).toList());
         return voPage;

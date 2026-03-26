@@ -336,6 +336,8 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         vo.setTotalServiceFee(totalService.setScale(2, RoundingMode.HALF_UP));
         vo.setTotalFee(totalCharge.add(totalService).setScale(2, RoundingMode.HALF_UP));
         vo.setDaily(daily);
+        // 按充电站聚合明细
+        vo.setStationList(orderMapper.selectIncomeByStation(operatorId, startDate, endDate.plusDays(1)));
         return vo;
     }
 
