@@ -44,10 +44,11 @@ public class OrderController {
     @GetMapping("/my")
     public Result<Page<OrderVO>> listMy(
             @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "payStatus", required = false) String payStatus,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Long userId = SecurityUtils.getCurrentUserId();
-        return Result.success(orderService.listMy(userId, status, page, size));
+        return Result.success(orderService.listMy(userId, status, payStatus, page, size));
     }
 
     @PostMapping("/{orderId}/refund")

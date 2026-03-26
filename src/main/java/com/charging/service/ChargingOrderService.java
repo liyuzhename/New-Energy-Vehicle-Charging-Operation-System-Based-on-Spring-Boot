@@ -18,7 +18,7 @@ public interface ChargingOrderService {
 
     OrderDetailVO getDetail(Long orderId);
 
-    Page<OrderVO> listMy(Long userId, String status, int page, int size);
+    Page<OrderVO> listMy(Long userId, String status, String payStatus, int page, int size);
 
     Page<OrderVO> listForOperator(Long operatorId, Long stationId, String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
 

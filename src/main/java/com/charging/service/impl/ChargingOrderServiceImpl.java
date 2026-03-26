@@ -238,11 +238,12 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     }
 
     @Override
-    public Page<OrderVO> listMy(Long userId, String status, int page, int size) {
+    public Page<OrderVO> listMy(Long userId, String status, String payStatus, int page, int size) {
         LambdaQueryWrapper<ChargingOrder> wrapper = new LambdaQueryWrapper<ChargingOrder>()
                 .eq(ChargingOrder::getUserId, userId)
                 .orderByDesc(ChargingOrder::getCreateTime);
         if (status != null && !status.isEmpty()) wrapper.eq(ChargingOrder::getStatus, status);
+        if (payStatus != null && !payStatus.isEmpty()) wrapper.eq(ChargingOrder::getPayStatus, payStatus);
         Page<ChargingOrder> orderPage = orderMapper.selectPage(new Page<>(page, size), wrapper);
         return toVoPageWithDetails(orderPage);
     }
