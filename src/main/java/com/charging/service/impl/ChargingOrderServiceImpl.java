@@ -8,11 +8,13 @@ import com.charging.entity.ChargingGun;
 import com.charging.entity.ChargingOrder;
 import com.charging.entity.ChargingPile;
 import com.charging.entity.ChargingStation;
+import com.charging.entity.User;
 import com.charging.entity.Vehicle;
 import com.charging.mapper.ChargingGunMapper;
 import com.charging.mapper.ChargingOrderMapper;
 import com.charging.mapper.ChargingPileMapper;
 import com.charging.mapper.ChargingStationMapper;
+import com.charging.mapper.UserMapper;
 import com.charging.mapper.VehicleMapper;
 import com.charging.service.BillingRuleService;
 import com.charging.service.ChargingOrderService;
@@ -47,6 +49,7 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     private final WalletService walletService;
     private final ChargingStationMapper stationMapper;
     private final VehicleMapper vehicleMapper;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -131,6 +134,12 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         if (order.getVehicleId() != null) {
             Vehicle vehicle = vehicleMapper.selectById(order.getVehicleId());
             if (vehicle != null) vo.setPlateNo(vehicle.getPlateNo());
+        }
+        if (order.getUserId() != null) {
+            User user = userMapper.selectById(order.getUserId());
+            if (user != null) {
+                vo.setUserName(user.getNickname() != null ? user.getNickname() : user.getUsername());
+            }
         }
         return vo;
     }
@@ -367,6 +376,13 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
             if (o.getVehicleId() != null) {
                 Vehicle vehicle = vehicleMapper.selectById(o.getVehicleId());
                 if (vehicle != null) vo.setPlateNo(vehicle.getPlateNo());
+            }
+            // 用户昵称
+            if (o.getUserId() != null) {
+                User user = userMapper.selectById(o.getUserId());
+                if (user != null) {
+                    vo.setUserName(user.getNickname() != null ? user.getNickname() : user.getUsername());
+                }
             }
             // 充电时长（秒）
             if (o.getStartTime() != null && o.getEndTime() != null) {

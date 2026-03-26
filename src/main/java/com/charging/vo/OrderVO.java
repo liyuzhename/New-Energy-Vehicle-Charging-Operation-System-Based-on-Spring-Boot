@@ -60,4 +60,7 @@ public class OrderVO {
 
     /** 充电时长（秒） */
     private Long chargeDuration;
+
+    /** 用户昵称/用户名 */
+    private String userName;
 }
