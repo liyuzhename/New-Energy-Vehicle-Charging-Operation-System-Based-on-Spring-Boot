@@ -14,7 +14,7 @@ public interface FaultRecordService {
 
     List<FaultRecordVO> listMy(Long userId);
 
-    Page<FaultRecordVO> listForOperator(Long operatorId, String status, LocalDate startDate, LocalDate endDate, int page, int size);
+    Page<FaultRecordVO> listForOperator(Long operatorId, Long stationId, String status, LocalDate startDate, LocalDate endDate, int page, int size);
 
     void handle(Long operatorId, Long faultId, FaultHandleRequest request);
 

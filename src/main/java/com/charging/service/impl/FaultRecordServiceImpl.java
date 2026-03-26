@@ -60,11 +60,20 @@ public class FaultRecordServiceImpl implements FaultRecordService {
     }
 
     @Override
-    public Page<FaultRecordVO> listForOperator(Long operatorId, String status, LocalDate startDate, LocalDate endDate, int page, int size) {
+    public Page<FaultRecordVO> listForOperator(Long operatorId, Long stationId, String status, LocalDate startDate, LocalDate endDate, int page, int size) {
         List<Long> pileIds = pileMapper.selectList(
                 new LambdaQueryWrapper<ChargingPile>().eq(ChargingPile::getOperatorId, operatorId))
                 .stream().map(ChargingPile::getId).toList();
         if (pileIds.isEmpty()) return new Page<>(page, size);
+
+        // 若指定了充电站，进一步过滤该站下的充电桩
+        if (stationId != null) {
+            pileIds = pileIds.stream().filter(pid -> {
+                ChargingPile p = pileMapper.selectById(pid);
+                return p != null && stationId.equals(p.getStationId());
+            }).toList();
+            if (pileIds.isEmpty()) return new Page<>(page, size);
+        }
 
         LambdaQueryWrapper<FaultRecord> wrapper = new LambdaQueryWrapper<FaultRecord>()
                 .in(FaultRecord::getPileId, pileIds)
