@@ -88,15 +88,17 @@ public interface ChargingOrderMapper extends BaseMapper<ChargingOrder> {
                                                 @Param("endDate") LocalDate endDate);
 
     /**
-     * 统计各充电桩被占用的订单数（用于利用率分析），支持按充电站过滤
+     * 统计各充电桩被占用的订单数（用于利用率分析），支持按充电站过滤，返回 pileNo
      */
     @Select("<script>" +
-            "SELECT pile_id AS pileId, COUNT(*) AS orderCount, SUM(TIMESTAMPDIFF(MINUTE, start_time, IFNULL(end_time, NOW()))) AS occupiedMinutes " +
-            "FROM charging_order WHERE deleted = 0 " +
-            "<if test='operatorId != null'>AND operator_id = #{operatorId} </if>" +
-            "<if test='stationId != null'>AND station_id = #{stationId} </if>" +
-            "AND start_time >= #{startDate} AND start_time &lt; #{endDate} " +
-            "GROUP BY pile_id" +
+            "SELECT o.pile_id AS pileId, p.pile_no AS pileNo, COUNT(*) AS orderCount, " +
+            "SUM(TIMESTAMPDIFF(MINUTE, o.start_time, IFNULL(o.end_time, NOW()))) AS occupiedMinutes " +
+            "FROM charging_order o LEFT JOIN charging_pile p ON o.pile_id = p.id " +
+            "WHERE o.deleted = 0 " +
+            "<if test='operatorId != null'>AND o.operator_id = #{operatorId} </if>" +
+            "<if test='stationId != null'>AND o.station_id = #{stationId} </if>" +
+            "AND o.start_time >= #{startDate} AND o.start_time &lt; #{endDate} " +
+            "GROUP BY o.pile_id, p.pile_no" +
             "</script>")
     List<Map<String, Object>> selectPileUsage(@Param("operatorId") Long operatorId,
                                                @Param("stationId") Long stationId,
