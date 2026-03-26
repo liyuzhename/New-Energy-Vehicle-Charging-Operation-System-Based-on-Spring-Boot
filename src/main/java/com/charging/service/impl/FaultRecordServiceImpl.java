@@ -6,8 +6,10 @@ import com.charging.common.exception.BusinessException;
 import com.charging.dto.FaultCreateRequest;
 import com.charging.dto.FaultHandleRequest;
 import com.charging.entity.ChargingPile;
+import com.charging.entity.ChargingStation;
 import com.charging.entity.FaultRecord;
 import com.charging.mapper.ChargingPileMapper;
+import com.charging.mapper.ChargingStationMapper;
 import com.charging.mapper.FaultRecordMapper;
 import com.charging.service.FaultRecordService;
 import com.charging.vo.FaultRecordVO;
@@ -27,6 +29,7 @@ public class FaultRecordServiceImpl implements FaultRecordService {
 
     private final FaultRecordMapper faultRecordMapper;
     private final ChargingPileMapper pileMapper;
+    private final ChargingStationMapper stationMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -113,6 +116,14 @@ public class FaultRecordServiceImpl implements FaultRecordService {
     private FaultRecordVO toVO(FaultRecord r) {
         FaultRecordVO vo = new FaultRecordVO();
         BeanUtils.copyProperties(r, vo);
+        // 关联查询充电站名称
+        if (r.getPileId() != null) {
+            ChargingPile pile = pileMapper.selectById(r.getPileId());
+            if (pile != null && pile.getStationId() != null) {
+                ChargingStation station = stationMapper.selectById(pile.getStationId());
+                if (station != null) vo.setStationName(station.getName());
+            }
+        }
         return vo;
     }
 }

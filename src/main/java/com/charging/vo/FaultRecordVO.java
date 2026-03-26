@@ -15,6 +15,8 @@ public class FaultRecordVO {
 
     private String pileNo;
 
+    private String stationName;
+
     private String description;
 
     private String status;
