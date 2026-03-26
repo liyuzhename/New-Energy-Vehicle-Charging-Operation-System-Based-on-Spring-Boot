@@ -64,9 +64,11 @@ public class ReportController {
 
     @GetMapping("/export")
     public void export(
-            @RequestParam(value = "startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(value = "endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             HttpServletResponse response) throws IOException {
+        if (endDate == null) endDate = LocalDate.now();
+        if (startDate == null) startDate = endDate.minusDays(29);
         Long operatorId = null;
         String role = SecurityUtils.getCurrentUserRole();
         if ("OPERATOR".equals(role)) operatorId = SecurityUtils.getCurrentUserId();
