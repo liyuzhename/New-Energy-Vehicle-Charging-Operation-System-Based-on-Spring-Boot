@@ -21,6 +21,7 @@ public class OperatorOrderController {
 
     @GetMapping("/order/list")
     public Result<Page<OrderVO>> list(
+            @RequestParam(value = "stationId", required = false) Long stationId,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "orderNo", required = false) String orderNo,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -28,7 +29,7 @@ public class OperatorOrderController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         Long operatorId = SecurityUtils.getCurrentUserId();
-        return Result.success(orderService.listForOperator(operatorId, status, orderNo, startDate, endDate, page, size));
+        return Result.success(orderService.listForOperator(operatorId, stationId, status, orderNo, startDate, endDate, page, size));
     }
 
     @GetMapping("/income")
