@@ -16,5 +16,5 @@ public interface WalletService {
 
     void refund(Long userId, BigDecimal amount, Long orderId, String remark);
 
-    Page<PaymentRecordVO> getRecords(Long userId, int page, int size);
+    Page<PaymentRecordVO> getRecords(Long userId, String type, int page, int size);
 }

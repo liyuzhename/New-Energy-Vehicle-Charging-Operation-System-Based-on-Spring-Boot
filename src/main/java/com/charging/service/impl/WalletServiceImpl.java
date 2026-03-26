@@ -85,13 +85,15 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Page<PaymentRecordVO> getRecords(Long userId, int page, int size) {
+    public Page<PaymentRecordVO> getRecords(Long userId, String type, int page, int size) {
         Page<PaymentRecord> pageParam = new Page<>(page, size);
-        Page<PaymentRecord> recordPage = paymentRecordMapper.selectPage(pageParam,
-                new LambdaQueryWrapper<PaymentRecord>()
-                        .eq(PaymentRecord::getUserId, userId)
-                        .orderByDesc(PaymentRecord::getCreateTime)
-        );
+        LambdaQueryWrapper<PaymentRecord> wrapper = new LambdaQueryWrapper<PaymentRecord>()
+                .eq(PaymentRecord::getUserId, userId)
+                .orderByDesc(PaymentRecord::getCreateTime);
+        if (type != null && !type.isEmpty()) {
+            wrapper.eq(PaymentRecord::getType, type);
+        }
+        Page<PaymentRecord> recordPage = paymentRecordMapper.selectPage(pageParam, wrapper);
 
         Page<PaymentRecordVO> voPage = new Page<>(recordPage.getCurrent(), recordPage.getSize(), recordPage.getTotal());
         voPage.setRecords(recordPage.getRecords().stream().map(r -> {
