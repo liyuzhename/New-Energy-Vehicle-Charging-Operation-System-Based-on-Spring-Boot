@@ -20,9 +20,9 @@ public interface ChargingOrderService {
 
     Page<OrderVO> listMy(Long userId, String status, String payStatus, int page, int size);
 
-    Page<OrderVO> listForOperator(Long operatorId, Long stationId, String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
+    Page<OrderVO> listForOperator(Long operatorId, Long stationId, String status, String payStatus, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
 
-    Page<OrderVO> listForAdmin(String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
+    Page<OrderVO> listForAdmin(String status, String payStatus, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size);
 
     void applyRefund(Long userId, Long orderId);
 

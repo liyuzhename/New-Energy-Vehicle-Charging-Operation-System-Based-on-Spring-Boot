@@ -249,12 +249,13 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     }
 
     @Override
-    public Page<OrderVO> listForOperator(Long operatorId, Long stationId, String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size) {
+    public Page<OrderVO> listForOperator(Long operatorId, Long stationId, String status, String payStatus, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size) {
         LambdaQueryWrapper<ChargingOrder> wrapper = new LambdaQueryWrapper<ChargingOrder>()
                 .eq(ChargingOrder::getOperatorId, operatorId)
                 .orderByDesc(ChargingOrder::getCreateTime);
         if (stationId != null) wrapper.eq(ChargingOrder::getStationId, stationId);
         if (status != null && !status.isEmpty()) wrapper.eq(ChargingOrder::getStatus, status);
+        if (payStatus != null && !payStatus.isEmpty()) wrapper.eq(ChargingOrder::getPayStatus, payStatus);
         if (orderNo != null && !orderNo.isEmpty()) wrapper.like(ChargingOrder::getOrderNo, orderNo);
         if (startDate != null) wrapper.ge(ChargingOrder::getCreateTime, startDate.atStartOfDay());
         if (endDate != null) wrapper.lt(ChargingOrder::getCreateTime, endDate.plusDays(1).atStartOfDay());
@@ -262,10 +263,11 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     }
 
     @Override
-    public Page<OrderVO> listForAdmin(String status, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size) {
+    public Page<OrderVO> listForAdmin(String status, String payStatus, String orderNo, LocalDate startDate, LocalDate endDate, int page, int size) {
         LambdaQueryWrapper<ChargingOrder> wrapper = new LambdaQueryWrapper<ChargingOrder>()
                 .orderByDesc(ChargingOrder::getCreateTime);
         if (status != null && !status.isEmpty()) wrapper.eq(ChargingOrder::getStatus, status);
+        if (payStatus != null && !payStatus.isEmpty()) wrapper.eq(ChargingOrder::getPayStatus, payStatus);
         if (orderNo != null && !orderNo.isEmpty()) wrapper.like(ChargingOrder::getOrderNo, orderNo);
         if (startDate != null) wrapper.ge(ChargingOrder::getCreateTime, startDate.atStartOfDay());
         if (endDate != null) wrapper.lt(ChargingOrder::getCreateTime, endDate.plusDays(1).atStartOfDay());
