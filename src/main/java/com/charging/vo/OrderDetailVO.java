@@ -41,4 +41,16 @@ public class OrderDetailVO {
     private LocalDateTime createTime;
 
     private FeeDetailVO feeDetail;
+
+    /** 充电站名称 */
+    private String stationName;
+
+    /** 充电桩编号 */
+    private String pileNo;
+
+    /** 车牌号 */
+    private String plateNo;
+
+    /** 充电时长（秒） */
+    private Long chargeDuration;
 }

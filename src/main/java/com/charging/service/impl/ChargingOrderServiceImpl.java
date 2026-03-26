@@ -170,6 +170,19 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         OrderDetailVO vo = new OrderDetailVO();
         BeanUtils.copyProperties(order, vo);
         vo.setFeeDetail(feeDetail);
+        // 填充关联字段
+        if (pile != null) vo.setPileNo(pile.getPileNo());
+        if (order.getStationId() != null) {
+            ChargingStation station = stationMapper.selectById(order.getStationId());
+            if (station != null) vo.setStationName(station.getName());
+        }
+        if (order.getVehicleId() != null) {
+            Vehicle vehicle = vehicleMapper.selectById(order.getVehicleId());
+            if (vehicle != null) vo.setPlateNo(vehicle.getPlateNo());
+        }
+        if (order.getStartTime() != null && order.getEndTime() != null) {
+            vo.setChargeDuration(java.time.Duration.between(order.getStartTime(), order.getEndTime()).getSeconds());
+        }
         return vo;
     }
 
@@ -188,11 +201,29 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
                     order.getStartTime(), now);
             vo.setTotalFee(feeDetail.getTotalFee());
             vo.setFeeDetail(feeDetail);
+            if (order.getStartTime() != null) {
+                vo.setChargeDuration(java.time.Duration.between(order.getStartTime(), now).getSeconds());
+            }
         } else if (order.getEndTime() != null) {
-            FeeDetailVO feeDetail = billingRuleService.calculateFee(
-                    order.getStationId(), pile != null ? pile.getPower() : new BigDecimal("7.0"),
-                    order.getStartTime(), order.getEndTime());
+            // 已完成订单：直接用数据库存储的费用构建 feeDetail，避免重算与历史数据不一致
+            FeeDetailVO feeDetail = new FeeDetailVO();
+            feeDetail.setTotalChargeKwh(order.getChargeKwh());
+            feeDetail.setTotalChargeFee(order.getChargeFee());
+            feeDetail.setTotalServiceFee(order.getServiceFee());
+            feeDetail.setTotalFee(order.getTotalFee());
+            feeDetail.setSegments(java.util.Collections.emptyList());
             vo.setFeeDetail(feeDetail);
+            vo.setChargeDuration(java.time.Duration.between(order.getStartTime(), order.getEndTime()).getSeconds());
+        }
+        // 填充关联字段
+        if (pile != null) vo.setPileNo(pile.getPileNo());
+        if (order.getStationId() != null) {
+            ChargingStation station = stationMapper.selectById(order.getStationId());
+            if (station != null) vo.setStationName(station.getName());
+        }
+        if (order.getVehicleId() != null) {
+            Vehicle vehicle = vehicleMapper.selectById(order.getVehicleId());
+            if (vehicle != null) vo.setPlateNo(vehicle.getPlateNo());
         }
         return vo;
     }
