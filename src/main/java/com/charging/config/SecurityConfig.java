@@ -54,11 +54,12 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 公开接口：注册、登录
                 .requestMatchers("/api/auth/**").permitAll()
-                // 用户端公开接口：充电站列表/详情、计费规则、评价列表
+                // 用户端公开接口：充电站列表/详情、计费规则、评价列表、公告列表
                 .requestMatchers("/api/station/list", "/api/station/{id}",
                                  "/api/station/{stationId}/piles",
                                  "/api/billing/list/**",
-                                 "/api/evaluation/station/**").permitAll()
+                                 "/api/evaluation/station/**",
+                                 "/api/announcement/list").permitAll()
                 // 管理员接口
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // 运营商接口
