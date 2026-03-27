@@ -63,6 +63,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // 运营商接口
                 .requestMatchers("/api/operator/**").hasAnyRole("OPERATOR", "ADMIN")
+                // 运营商/管理员共用报表接口
+                .requestMatchers("/api/report/**").hasAnyRole("OPERATOR", "ADMIN")
                 // 其他接口需要认证
                 .anyRequest().authenticated()
             )
