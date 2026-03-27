@@ -114,4 +114,43 @@ public class ReportServiceImpl implements ReportService {
             throw new RuntimeException("Excel导出失败", e);
         }
     }
+
+    @Override
+    public byte[] exportAdminReportExcel(LocalDate startDate, LocalDate endDate) {
+        try (Workbook wb = new XSSFWorkbook()) {
+            // Sheet1: 用户月度增长
+            Sheet userSheet = wb.createSheet("用户月度增长");
+            Row userHeader = userSheet.createRow(0);
+            userHeader.createCell(0).setCellValue("月份");
+            userHeader.createCell(1).setCellValue("新增用户数");
+            List<Map<String, Object>> userGrowthData = userGrowth(startDate, endDate);
+            for (int i = 0; i < userGrowthData.size(); i++) {
+                Map<String, Object> item = userGrowthData.get(i);
+                Row row = userSheet.createRow(i + 1);
+                row.createCell(0).setCellValue(String.valueOf(item.get("month")));
+                Object newUsers = item.get("newUsers");
+                row.createCell(1).setCellValue(newUsers != null ? Long.parseLong(newUsers.toString()) : 0);
+            }
+
+            // Sheet2: 高故障率充电桩排行
+            Sheet faultSheet = wb.createSheet("高故障率充电桩排行");
+            Row faultHeader = faultSheet.createRow(0);
+            faultHeader.createCell(0).setCellValue("充电桩编号");
+            faultHeader.createCell(1).setCellValue("故障次数");
+            List<Map<String, Object>> faultData = faultAnalysis(null);
+            for (int i = 0; i < faultData.size(); i++) {
+                Map<String, Object> item = faultData.get(i);
+                Row row = faultSheet.createRow(i + 1);
+                row.createCell(0).setCellValue(String.valueOf(item.get("pileNo")));
+                Object faultCount = item.get("faultCount");
+                row.createCell(1).setCellValue(faultCount != null ? Long.parseLong(faultCount.toString()) : 0);
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            wb.write(out);
+            return out.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Excel导出失败", e);
+        }
+    }
 }

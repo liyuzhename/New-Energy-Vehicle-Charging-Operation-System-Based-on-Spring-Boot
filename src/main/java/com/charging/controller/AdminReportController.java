@@ -51,17 +51,17 @@ public class AdminReportController {
         return Result.success(reportService.dashboard());
     }
 
-    /** 管理员导出全平台订单 Excel */
+    /** 管理员导出统计报表 Excel（用户增长 + 故障排行） */
     @GetMapping("/report/export")
     public void export(
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             HttpServletResponse response) throws IOException {
         if (endDate == null) endDate = LocalDate.now();
-        if (startDate == null) startDate = endDate.minusDays(29);
-        byte[] data = reportService.exportOrderExcel(null, startDate, endDate);
+        if (startDate == null) startDate = endDate.minusMonths(6);
+        byte[] data = reportService.exportAdminReportExcel(startDate, endDate);
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=orders.xlsx");
+        response.setHeader("Content-Disposition", "attachment; filename=admin-report.xlsx");
         response.getOutputStream().write(data);
     }
 }

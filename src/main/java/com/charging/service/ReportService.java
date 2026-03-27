@@ -19,4 +19,6 @@ public interface ReportService {
     DashboardVO dashboard();
 
     byte[] exportOrderExcel(Long operatorId, LocalDate startDate, LocalDate endDate);
+
+    byte[] exportAdminReportExcel(LocalDate startDate, LocalDate endDate);
 }
