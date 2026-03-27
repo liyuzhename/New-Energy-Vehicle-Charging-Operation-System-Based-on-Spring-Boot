@@ -49,7 +49,10 @@ public class OperationLogAspect {
             if (auth != null && auth.isAuthenticated() && auth.getPrincipal() instanceof Long userId) {
                 opLog.setOperatorId(userId);
                 User user = userMapper.selectById(userId);
-                if (user != null) opLog.setOperatorName(user.getUsername());
+                if (user != null) {
+                    opLog.setOperatorName(user.getUsername());
+                    opLog.setRole(user.getRole());
+                }
             }
         } catch (Exception ignored) {}
 

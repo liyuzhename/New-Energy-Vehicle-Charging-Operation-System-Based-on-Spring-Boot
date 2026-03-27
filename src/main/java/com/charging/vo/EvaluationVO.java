@@ -32,4 +32,7 @@ public class EvaluationVO {
 
     /** 评价用户头像 */
     private String userAvatar;
+
+    /** 充电站名称 */
+    private String stationName;
 }

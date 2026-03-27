@@ -68,7 +68,7 @@ public class ReportServiceImpl implements ReportService {
                 new LambdaQueryWrapper<ChargingOrder>()
                         .ge(ChargingOrder::getCreateTime, today.atStartOfDay())
                         .lt(ChargingOrder::getCreateTime, today.plusDays(1).atStartOfDay())));
-        List<Map<String, Object>> todayIncome = orderMapper.selectDailyIncome(null, today, today.plusDays(1));
+        List<Map<String, Object>> todayIncome = orderMapper.selectDailyIncome(null, null, today, today.plusDays(1));
         BigDecimal income = BigDecimal.ZERO;
         if (!todayIncome.isEmpty()) {
             Object t = todayIncome.get(0).get("totalFee");

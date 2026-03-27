@@ -271,7 +271,7 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         if (orderNo != null && !orderNo.isEmpty()) wrapper.like(ChargingOrder::getOrderNo, orderNo);
         if (startDate != null) wrapper.ge(ChargingOrder::getCreateTime, startDate.atStartOfDay());
         if (endDate != null) wrapper.lt(ChargingOrder::getCreateTime, endDate.plusDays(1).atStartOfDay());
-        return toVoPage(orderMapper.selectPage(new Page<>(page, size), wrapper));
+        return toVoPageWithDetails(orderMapper.selectPage(new Page<>(page, size), wrapper));
     }
 
     @Override

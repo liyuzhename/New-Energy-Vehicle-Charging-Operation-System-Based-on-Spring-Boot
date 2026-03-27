@@ -44,9 +44,10 @@ public class EvaluationController {
     public Result<Page<EvaluationVO>> listAll(
             @RequestParam(value = "rating", required = false) Integer rating,
             @RequestParam(value = "isHidden", required = false) Integer isHidden,
+            @RequestParam(value = "stationId", required = false) Long stationId,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        return Result.success(evaluationService.listAll(rating, isHidden, page, size));
+        return Result.success(evaluationService.listAll(rating, isHidden, stationId, page, size));
     }
 
     @PutMapping("/api/admin/evaluation/{id}/hide")

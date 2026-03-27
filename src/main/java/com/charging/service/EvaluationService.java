@@ -11,7 +11,7 @@ public interface EvaluationService {
 
     Page<EvaluationVO> listByStation(Long stationId, int page, int size);
 
-    Page<EvaluationVO> listAll(Integer rating, Integer isHidden, int page, int size);
+    Page<EvaluationVO> listAll(Integer rating, Integer isHidden, Long stationId, int page, int size);
 
     void reply(Long operatorId, Long evaluationId, EvaluationReplyRequest request);
 

@@ -13,7 +13,7 @@ public interface AdminService {
 
     Page<UserManageVO> listOperators(String keyword, int page, int size);
 
-    Page<AnnouncementVO> listAnnouncements(String keyword, int page, int size);
+    Page<AnnouncementVO> listAnnouncements(String keyword, String type, String status, int page, int size);
 
     void createAnnouncement(Long adminId, AnnouncementRequest request);
 

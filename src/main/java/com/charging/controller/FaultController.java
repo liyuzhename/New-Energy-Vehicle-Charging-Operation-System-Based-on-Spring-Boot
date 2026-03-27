@@ -57,10 +57,11 @@ public class FaultController {
     @GetMapping("/api/admin/fault/list")
     public Result<Page<FaultRecordVO>> listForAdmin(
             @RequestParam(value = "status", required = false) String status,
+            @RequestParam(value = "stationId", required = false) Long stationId,
             @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        return Result.success(faultRecordService.listForAdmin(status, startDate, endDate, page, size));
+        return Result.success(faultRecordService.listForAdmin(status, stationId, startDate, endDate, page, size));
     }
 }

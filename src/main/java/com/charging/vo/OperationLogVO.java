@@ -13,6 +13,8 @@ public class OperationLogVO {
 
     private String operatorName;
 
+    private String role;
+
     private String operation;
 
     private String method;

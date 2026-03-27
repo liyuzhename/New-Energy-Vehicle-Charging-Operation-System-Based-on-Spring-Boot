@@ -17,6 +17,12 @@ public class FaultRecordVO {
 
     private String stationName;
 
+    /** 运营商名称 */
+    private String operatorName;
+
+    /** 提报人用户名 */
+    private String reporterName;
+
     private String description;
 
     private String status;

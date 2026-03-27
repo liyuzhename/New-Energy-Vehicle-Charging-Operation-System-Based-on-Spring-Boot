@@ -77,16 +77,30 @@ public class EvaluationServiceImpl implements EvaluationService {
     }
 
     @Override
-    public Page<EvaluationVO> listAll(Integer rating, Integer isHidden, int page, int size) {
+    public Page<EvaluationVO> listAll(Integer rating, Integer isHidden, Long stationId, int page, int size) {
         LambdaQueryWrapper<Evaluation> wrapper = new LambdaQueryWrapper<Evaluation>()
                 .orderByDesc(Evaluation::getCreateTime);
         if (rating != null) wrapper.eq(Evaluation::getRating, rating);
         if (isHidden != null) wrapper.eq(Evaluation::getIsHidden, isHidden);
+        if (stationId != null) wrapper.eq(Evaluation::getStationId, stationId);
         Page<Evaluation> pageResult = evaluationMapper.selectPage(new Page<>(page, size), wrapper);
         Page<EvaluationVO> voPage = new Page<>(pageResult.getCurrent(), pageResult.getSize(), pageResult.getTotal());
         voPage.setRecords(pageResult.getRecords().stream().map(e -> {
             EvaluationVO vo = new EvaluationVO();
             BeanUtils.copyProperties(e, vo);
+            // 关联查询用户昵称和头像
+            if (e.getUserId() != null) {
+                User user = userMapper.selectById(e.getUserId());
+                if (user != null) {
+                    vo.setUserName(user.getNickname() != null ? user.getNickname() : user.getUsername());
+                    vo.setUserAvatar(user.getAvatar());
+                }
+            }
+            // 关联查询充电站名称
+            if (e.getStationId() != null) {
+                ChargingStation station = stationMapper.selectById(e.getStationId());
+                if (station != null) vo.setStationName(station.getName());
+            }
             return vo;
         }).toList());
         return voPage;

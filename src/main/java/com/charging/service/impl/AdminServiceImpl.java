@@ -76,12 +76,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<AnnouncementVO> listAnnouncements(String keyword, int page, int size) {
+    public Page<AnnouncementVO> listAnnouncements(String keyword, String type, String status, int page, int size) {
         LambdaQueryWrapper<Announcement> wrapper = new LambdaQueryWrapper<Announcement>()
                 .orderByDesc(Announcement::getCreateTime);
         if (keyword != null && !keyword.isBlank()) {
             wrapper.and(w -> w.like(Announcement::getTitle, keyword).or().like(Announcement::getContent, keyword));
         }
+        if (type != null && !type.isBlank()) wrapper.eq(Announcement::getType, type);
+        if (status != null && !status.isBlank()) wrapper.eq(Announcement::getStatus, status);
         Page<Announcement> aPage = announcementMapper.selectPage(new Page<>(page, size), wrapper);
         Page<AnnouncementVO> voPage = new Page<>(aPage.getCurrent(), aPage.getSize(), aPage.getTotal());
         voPage.setRecords(aPage.getRecords().stream().map(a -> {

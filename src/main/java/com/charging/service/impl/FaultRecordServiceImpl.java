@@ -8,9 +8,11 @@ import com.charging.dto.FaultHandleRequest;
 import com.charging.entity.ChargingPile;
 import com.charging.entity.ChargingStation;
 import com.charging.entity.FaultRecord;
+import com.charging.entity.User;
 import com.charging.mapper.ChargingPileMapper;
 import com.charging.mapper.ChargingStationMapper;
 import com.charging.mapper.FaultRecordMapper;
+import com.charging.mapper.UserMapper;
 import com.charging.service.FaultRecordService;
 import com.charging.vo.FaultRecordVO;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class FaultRecordServiceImpl implements FaultRecordService {
     private final FaultRecordMapper faultRecordMapper;
     private final ChargingPileMapper pileMapper;
     private final ChargingStationMapper stationMapper;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -107,10 +110,17 @@ public class FaultRecordServiceImpl implements FaultRecordService {
     }
 
     @Override
-    public Page<FaultRecordVO> listForAdmin(String status, LocalDate startDate, LocalDate endDate, int page, int size) {
+    public Page<FaultRecordVO> listForAdmin(String status, Long stationId, LocalDate startDate, LocalDate endDate, int page, int size) {
         LambdaQueryWrapper<FaultRecord> wrapper = new LambdaQueryWrapper<FaultRecord>()
                 .orderByDesc(FaultRecord::getCreateTime);
         if (status != null && !status.isEmpty()) wrapper.eq(FaultRecord::getStatus, status);
+        if (stationId != null) {
+            List<Long> pileIds = pileMapper.selectList(
+                    new LambdaQueryWrapper<ChargingPile>().eq(ChargingPile::getStationId, stationId))
+                    .stream().map(ChargingPile::getId).toList();
+            if (pileIds.isEmpty()) return new Page<>(page, size);
+            wrapper.in(FaultRecord::getPileId, pileIds);
+        }
         if (startDate != null) wrapper.ge(FaultRecord::getCreateTime, startDate.atStartOfDay());
         if (endDate != null) wrapper.le(FaultRecord::getCreateTime, endDate.atTime(23, 59, 59));
         return toVoPage(faultRecordMapper.selectPage(new Page<>(page, size), wrapper));
@@ -125,13 +135,24 @@ public class FaultRecordServiceImpl implements FaultRecordService {
     private FaultRecordVO toVO(FaultRecord r) {
         FaultRecordVO vo = new FaultRecordVO();
         BeanUtils.copyProperties(r, vo);
-        // 关联查询充电站名称
+        // 关联查询充电站名称和运营商名称
         if (r.getPileId() != null) {
             ChargingPile pile = pileMapper.selectById(r.getPileId());
-            if (pile != null && pile.getStationId() != null) {
-                ChargingStation station = stationMapper.selectById(pile.getStationId());
-                if (station != null) vo.setStationName(station.getName());
+            if (pile != null) {
+                if (pile.getStationId() != null) {
+                    ChargingStation station = stationMapper.selectById(pile.getStationId());
+                    if (station != null) vo.setStationName(station.getName());
+                }
+                if (pile.getOperatorId() != null) {
+                    User operator = userMapper.selectById(pile.getOperatorId());
+                    if (operator != null) vo.setOperatorName(operator.getNickname() != null ? operator.getNickname() : operator.getUsername());
+                }
             }
+        }
+        // 关联查询提报人名称
+        if (r.getUserId() != null) {
+            User reporter = userMapper.selectById(r.getUserId());
+            if (reporter != null) vo.setReporterName(reporter.getNickname() != null ? reporter.getNickname() : reporter.getUsername());
         }
         return vo;
     }

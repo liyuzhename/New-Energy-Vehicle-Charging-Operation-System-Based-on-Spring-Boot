@@ -18,5 +18,5 @@ public interface FaultRecordService {
 
     void handle(Long operatorId, Long faultId, FaultHandleRequest request);
 
-    Page<FaultRecordVO> listForAdmin(String status, LocalDate startDate, LocalDate endDate, int page, int size);
+    Page<FaultRecordVO> listForAdmin(String status, Long stationId, LocalDate startDate, LocalDate endDate, int page, int size);
 }

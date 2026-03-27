@@ -18,6 +18,8 @@ public class OperationLog {
 
     private String operatorName;
 
+    private String role;
+
     private String operation;
 
     private String method;
