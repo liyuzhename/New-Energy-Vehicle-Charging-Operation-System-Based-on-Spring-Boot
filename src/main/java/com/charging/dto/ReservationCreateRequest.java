@@ -11,6 +11,9 @@ public class ReservationCreateRequest {
     @NotNull(message = "充电桩ID不能为空")
     private Long pileId;
 
+    @NotNull(message = "充电枪ID不能为空")
+    private Long gunId;
+
     @NotNull(message = "预约开始时间不能为空")
     private LocalDateTime startTime;
 

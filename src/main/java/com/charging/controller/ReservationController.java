@@ -7,6 +7,7 @@ import com.charging.security.util.SecurityUtils;
 import com.charging.service.ReservationService;
 import com.charging.vo.ReservationVO;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,5 +39,26 @@ public class ReservationController {
         Long userId = SecurityUtils.getCurrentUserId();
         reservationService.cancel(userId, id);
         return Result.success("预约已取消", null);
+    }
+
+    @PutMapping("/{id}/confirm")
+    public Result<Void> confirm(@PathVariable("id") Long id) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        reservationService.confirm(userId, id);
+        return Result.success("确认到场成功", null);
+    }
+
+    @PostMapping("/{id}/start-charging")
+    public Result<Long> startCharging(@PathVariable("id") Long id,
+                                      @RequestBody(required = false) StartChargingBody body) {
+        Long userId = SecurityUtils.getCurrentUserId();
+        Long vehicleId = body != null ? body.getVehicleId() : null;
+        Long orderId = reservationService.startCharging(userId, id, vehicleId);
+        return Result.success("充电已开始", orderId);
+    }
+
+    @Data
+    static class StartChargingBody {
+        private Long vehicleId;
     }
 }

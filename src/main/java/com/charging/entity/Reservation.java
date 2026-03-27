@@ -17,6 +17,10 @@ public class Reservation {
 
     private Long pileId;
 
+    private Long gunId;
+
+    private Long orderId;
+
     private LocalDate reserveDate;
 
     private LocalDateTime startTime;

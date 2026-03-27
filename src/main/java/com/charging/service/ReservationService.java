@@ -11,4 +11,8 @@ public interface ReservationService {
     Page<ReservationVO> listMy(Long userId, String status, int page, int size);
 
     void cancel(Long userId, Long reservationId);
+
+    void confirm(Long userId, Long reservationId);
+
+    Long startCharging(Long userId, Long reservationId, Long vehicleId);
 }

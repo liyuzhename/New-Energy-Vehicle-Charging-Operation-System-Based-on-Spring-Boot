@@ -33,4 +33,9 @@ public interface ChargingOrderService {
     void pay(Long userId, Long orderId);
 
     IncomeVO getIncome(Long operatorId, Long stationId, LocalDate startDate, LocalDate endDate);
+
+    /**
+     * 通过预约发起充电（直接使用预约中指定的充电枪）
+     */
+    OrderVO startByReservation(Long userId, Long reservationId, Long vehicleId);
 }

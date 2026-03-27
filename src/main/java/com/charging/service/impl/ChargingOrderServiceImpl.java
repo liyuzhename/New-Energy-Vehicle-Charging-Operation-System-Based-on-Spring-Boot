@@ -8,12 +8,14 @@ import com.charging.entity.ChargingGun;
 import com.charging.entity.ChargingOrder;
 import com.charging.entity.ChargingPile;
 import com.charging.entity.ChargingStation;
+import com.charging.entity.Reservation;
 import com.charging.entity.User;
 import com.charging.entity.Vehicle;
 import com.charging.mapper.ChargingGunMapper;
 import com.charging.mapper.ChargingOrderMapper;
 import com.charging.mapper.ChargingPileMapper;
 import com.charging.mapper.ChargingStationMapper;
+import com.charging.mapper.ReservationMapper;
 import com.charging.mapper.UserMapper;
 import com.charging.mapper.VehicleMapper;
 import com.charging.service.BillingRuleService;
@@ -50,6 +52,7 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
     private final ChargingStationMapper stationMapper;
     private final VehicleMapper vehicleMapper;
     private final UserMapper userMapper;
+    private final ReservationMapper reservationMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -345,6 +348,53 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
         vo.setStationList(orderMapper.selectIncomeByStation(operatorId, stationId, startDate, endExclusive));
         // 按充电站+日期双维度明细（含日期字段，用于收益明细列表）
         vo.setDetailList(orderMapper.selectIncomeByStationAndDay(operatorId, stationId, startDate, endExclusive));
+        return vo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public OrderVO startByReservation(Long userId, Long reservationId, Long vehicleId) {
+        Reservation reservation = reservationMapper.selectById(reservationId);
+        if (reservation == null) throw new BusinessException(404, "预约不存在");
+        if (reservation.getGunId() == null) throw new BusinessException(400, "预约未关联充电枪");
+
+        ChargingGun gun = gunMapper.selectById(reservation.getGunId());
+        if (gun == null) throw new BusinessException(404, "充电枪不存在");
+        if (!"RESERVED".equals(gun.getStatus())) throw new BusinessException(400, "充电枪当前状态不可充电，状态：" + gun.getStatus());
+
+        long existingCount = orderMapper.selectCount(
+                new LambdaQueryWrapper<ChargingOrder>()
+                        .eq(ChargingOrder::getUserId, userId)
+                        .eq(ChargingOrder::getStatus, "CHARGING"));
+        if (existingCount > 0) throw new BusinessException(400, "您已有正在充电的订单");
+
+        ChargingPile pile = pileMapper.selectById(gun.getPileId());
+        if (pile == null) throw new BusinessException(404, "充电桩不存在");
+
+        ChargingOrder order = new ChargingOrder();
+        order.setOrderNo(generateOrderNo());
+        order.setUserId(userId);
+        order.setVehicleId(vehicleId);
+        order.setGunId(gun.getId());
+        order.setPileId(pile.getId());
+        order.setStationId(pile.getStationId());
+        order.setOperatorId(pile.getOperatorId());
+        order.setStartTime(LocalDateTime.now());
+        order.setChargeKwh(BigDecimal.ZERO);
+        order.setChargeFee(BigDecimal.ZERO);
+        order.setServiceFee(BigDecimal.ZERO);
+        order.setTotalFee(BigDecimal.ZERO);
+        order.setStatus("CHARGING");
+        order.setPayStatus("UNPAID");
+        orderMapper.insert(order);
+
+        gun.setStatus("CHARGING");
+        gunMapper.updateById(gun);
+        pile.setStatus("OCCUPIED");
+        pileMapper.updateById(pile);
+
+        OrderVO vo = new OrderVO();
+        BeanUtils.copyProperties(order, vo);
         return vo;
     }
 

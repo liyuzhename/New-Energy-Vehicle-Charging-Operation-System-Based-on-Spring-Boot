@@ -14,6 +14,10 @@ public class ReservationVO {
 
     private Long pileId;
 
+    private Long gunId;
+
+    private Long orderId;
+
     private LocalDate reserveDate;
 
     private LocalDateTime startTime;
@@ -29,6 +33,9 @@ public class ReservationVO {
 
     /** 充电桩编号 */
     private String pileNo;
+
+    /** 充电枪编号 */
+    private String gunNo;
 
     /** 车牌号 */
     private String plateNo;
