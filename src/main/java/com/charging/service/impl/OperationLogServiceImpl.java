@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 public class OperationLogServiceImpl implements OperationLogService {
@@ -22,12 +24,17 @@ public class OperationLogServiceImpl implements OperationLogService {
     }
 
     @Override
-    public Page<OperationLogVO> list(String operatorName, int page, int size) {
+    public Page<OperationLogVO> list(String operatorName, String keyword, LocalDate startDate, LocalDate endDate, int page, int size) {
         LambdaQueryWrapper<OperationLog> wrapper = new LambdaQueryWrapper<OperationLog>()
                 .orderByDesc(OperationLog::getCreateTime);
         if (operatorName != null && !operatorName.isEmpty()) {
             wrapper.like(OperationLog::getOperatorName, operatorName);
         }
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.and(w -> w.like(OperationLog::getOperation, keyword).or().like(OperationLog::getMethod, keyword));
+        }
+        if (startDate != null) wrapper.ge(OperationLog::getCreateTime, startDate.atStartOfDay());
+        if (endDate != null) wrapper.le(OperationLog::getCreateTime, endDate.atTime(23, 59, 59));
         Page<OperationLog> logPage = operationLogMapper.selectPage(new Page<>(page, size), wrapper);
         Page<OperationLogVO> voPage = new Page<>(logPage.getCurrent(), logPage.getSize(), logPage.getTotal());
         voPage.setRecords(logPage.getRecords().stream().map(l -> {

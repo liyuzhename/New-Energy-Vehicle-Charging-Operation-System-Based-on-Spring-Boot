@@ -14,8 +14,10 @@ import com.charging.vo.OperationLogVO;
 import com.charging.vo.UserManageVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,9 +99,12 @@ public class AdminController {
     @GetMapping("/log/list")
     public Result<Page<OperationLogVO>> listLogs(
             @RequestParam(value = "operatorName", required = false) String operatorName,
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
-        return Result.success(operationLogService.list(operatorName, page, size));
+        return Result.success(operationLogService.list(operatorName, keyword, startDate, endDate, page, size));
     }
 
     /** 获取所有充电站简要列表（供故障/评价管理搜索下拉框使用） */
