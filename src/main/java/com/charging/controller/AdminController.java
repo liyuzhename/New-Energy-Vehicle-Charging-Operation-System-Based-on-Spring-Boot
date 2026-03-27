@@ -1,8 +1,11 @@
 package com.charging.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.charging.common.result.Result;
 import com.charging.dto.AnnouncementRequest;
+import com.charging.entity.ChargingStation;
+import com.charging.mapper.ChargingStationMapper;
 import com.charging.security.util.SecurityUtils;
 import com.charging.service.AdminService;
 import com.charging.service.OperationLogService;
@@ -13,6 +16,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor
@@ -20,6 +27,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final OperationLogService operationLogService;
+    private final ChargingStationMapper stationMapper;
 
     @GetMapping("/user/list")
     public Result<Page<UserManageVO>> listUsers(
@@ -92,5 +100,20 @@ public class AdminController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         return Result.success(operationLogService.list(operatorName, page, size));
+    }
+
+    /** 获取所有充电站简要列表（供故障/评价管理搜索下拉框使用） */
+    @GetMapping("/station/list")
+    public Result<List<Map<String, Object>>> listStations() {
+        List<ChargingStation> stations = stationMapper.selectList(
+                new LambdaQueryWrapper<ChargingStation>().orderByAsc(ChargingStation::getName));
+        List<Map<String, Object>> result = stations.stream().map(s -> {
+            Map<String, Object> m = new java.util.LinkedHashMap<>();
+            m.put("id", s.getId());
+            m.put("name", s.getName());
+            m.put("status", s.getStatus());
+            return m;
+        }).collect(Collectors.toList());
+        return Result.success(result);
     }
 }
