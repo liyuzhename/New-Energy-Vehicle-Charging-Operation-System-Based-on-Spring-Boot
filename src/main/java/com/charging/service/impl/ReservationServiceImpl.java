@@ -170,10 +170,10 @@ public class ReservationServiceImpl implements ReservationService {
             throw new BusinessException(400, "当前预约状态无法确认到场");
         }
         LocalDateTime now = LocalDateTime.now();
-        if (now.isBefore(reservation.getStartTime())) {
+        if (now.isBefore(reservation.getStartTime().minusMinutes(5))) {
             throw new BusinessException(400, "尚未到达预约时间段，无法确认到场");
         }
-        if (!now.isBefore(reservation.getEndTime())) {
+        if (!now.isBefore(reservation.getEndTime().plusMinutes(10))) {
             throw new BusinessException(400, "预约时间段已过");
         }
         reservation.setStatus("CONFIRMED");

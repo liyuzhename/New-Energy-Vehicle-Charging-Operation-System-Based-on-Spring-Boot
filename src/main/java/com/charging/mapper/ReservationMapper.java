@@ -43,10 +43,14 @@ public interface ReservationMapper extends BaseMapper<Reservation> {
 
     /**
      * 查询所有已过期但状态仍为PENDING/CONFIRMED的预约
+     * PENDING：过了endTime后再给10分钟宽限期（用户可能刚到场来不及操作）
+     * CONFIRMED：过了endTime即过期（已确认到场但未充电）
      */
     @Select("SELECT * FROM reservation WHERE deleted = 0 " +
-            "AND status IN ('PENDING','CONFIRMED') " +
-            "AND end_time < #{now}")
+            "AND (" +
+            "  (status = 'PENDING' AND end_time < DATE_SUB(#{now}, INTERVAL 10 MINUTE)) " +
+            "  OR (status = 'CONFIRMED' AND end_time < #{now})" +
+            ")")
     List<Reservation> selectOverdue(@Param("now") LocalDateTime now);
 
     /**
