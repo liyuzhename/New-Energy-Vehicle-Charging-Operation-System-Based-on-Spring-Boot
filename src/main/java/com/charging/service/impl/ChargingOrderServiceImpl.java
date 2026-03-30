@@ -360,7 +360,7 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
 
         ChargingGun gun = gunMapper.selectById(reservation.getGunId());
         if (gun == null) throw new BusinessException(404, "充电枪不存在");
-        if (!"RESERVED".equals(gun.getStatus())) throw new BusinessException(400, "充电枪当前状态不可充电，状态：" + gun.getStatus());
+        if (!"RESERVED".equals(gun.getStatus()) && !"IDLE".equals(gun.getStatus())) throw new BusinessException(400, "充电枪当前状态不可充电，状态：" + gun.getStatus());
 
         long existingCount = orderMapper.selectCount(
                 new LambdaQueryWrapper<ChargingOrder>()

@@ -1,11 +1,13 @@
 package com.charging.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ReservationCreateRequest {
 
     @NotNull(message = "充电桩ID不能为空")
