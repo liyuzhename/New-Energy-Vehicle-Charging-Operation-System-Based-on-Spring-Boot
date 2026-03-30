@@ -46,9 +46,7 @@ public class ReservationServiceImpl implements ReservationService {
         if (!request.getEndTime().isAfter(request.getStartTime())) {
             throw new BusinessException(400, "结束时间必须晚于开始时间");
         }
-        if (request.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new BusinessException(400, "预约开始时间不能早于当前时间");
-        }
+        // 不校验开始时间是否早于当前时间，允许用户预约当前时刻及未来时段
 
         // 校验充电枪存在且属于该充电桩
         ChargingGun gun = gunMapper.selectById(request.getGunId());
