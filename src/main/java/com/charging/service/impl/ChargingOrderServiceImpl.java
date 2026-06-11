@@ -68,12 +68,26 @@ public class ChargingOrderServiceImpl implements ChargingOrderService {
                         .eq(ChargingOrder::getStatus, "CHARGING"));
         if (existingCount > 0) throw new BusinessException(400, "您已有正在充电的订单");
 
-        // 获取第一个可用充电枪
-        ChargingGun gun = gunMapper.selectOne(
-                new LambdaQueryWrapper<ChargingGun>()
-                        .eq(ChargingGun::getPileId, pile.getId())
-                        .eq(ChargingGun::getStatus, "IDLE")
-                        .last("LIMIT 1"));
+        ChargingGun gun;
+        if (request.getGunId() != null) {
+            gun = gunMapper.selectById(request.getGunId());
+            if (gun == null || gun.getDeleted() == 1) {
+                throw new BusinessException(404, "充电枪不存在");
+            }
+            if (!gun.getPileId().equals(pile.getId())) {
+                throw new BusinessException(400, "充电枪不属于该充电桩");
+            }
+            if (!"IDLE".equals(gun.getStatus())) {
+                throw new BusinessException(400, "充电枪当前不可用，状态：" + gun.getStatus());
+            }
+        } else {
+            // 未指定枪口时，自动选取第一个空闲充电枪
+            gun = gunMapper.selectOne(
+                    new LambdaQueryWrapper<ChargingGun>()
+                            .eq(ChargingGun::getPileId, pile.getId())
+                            .eq(ChargingGun::getStatus, "IDLE")
+                            .last("LIMIT 1"));
+        }
 
         ChargingOrder order = new ChargingOrder();
         order.setOrderNo(generateOrderNo());
