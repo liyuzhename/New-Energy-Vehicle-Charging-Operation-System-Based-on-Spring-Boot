@@ -2,6 +2,7 @@
 
 > 本项目是一个基于**前后端分离**架构的新能源汽车充电桩运营管理系统。
 > 前端采用 Vue 3 生态，后端采用 Spring Boot 3.2.5 + MyBatis-Plus。
+> 前端仓库URL:https://github.com/liyuzhename/charing-vue
 
 ---
 
