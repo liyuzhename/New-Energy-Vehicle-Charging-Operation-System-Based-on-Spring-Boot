@@ -82,9 +82,10 @@
 
 1. **安装依赖**
    在前端项目目录（charging_vue）下执行：
+   ```bash
    npm install
 
-2. **启动开发服务器**
+3. **启动开发服务器**
    ```bash
    npm run dev
   
