@@ -73,3 +73,18 @@
    
    # 启动 Spring Boot 后端服务
    mvn spring-boot:run
+
+---
+
+## 五、前端服务安装与启动
+
+⚠️ 重要提醒： 由于开发环境配置了 Vite 的 API 代理，必须在后端启动完成后，再启动前端服务。
+
+1. **安装依赖**
+   在前端项目目录（charging_vue）下执行：
+   npm install
+
+2. **启动开发服务器**
+   ```bash
+   npm run dev
+  
